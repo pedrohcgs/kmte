@@ -1,0 +1,22 @@
+Package: kmte
+Type: Package
+Title: Treatment Effects with Censoring
+Version: 0.1.0
+Date: 2015-08-28
+Author: Pedro H. C. Sant'Anna
+Maintainer: Pedro H. C. Sant'Anna <pedro.h.santanna@vanderbilt.edu>
+Description: Provide several estimators and tests for treatment effects
+    when the outcome of interest, typically a duration variable, is subjected to
+    right-censoring mechanisms. In short, this package implement all the estimators
+    proposed in Sant'Anna (2016a), "Program Evaluation with Right-Censored Data",
+    and all the tests proposed in Sant'Anna (2016b),"Nonparametric Tests for
+    Treatment Effect Heterogeneity with Censored data".
+URL: \url{http://github.com/pedrohcgs/kmte}
+Depends:
+    R (>= 3.1)
+Imports:
+    MASS (>= 7.0),
+    stats
+License: GPL-2
+LazyData: TRUE
+RoxygenNote: 5.0.1.9000

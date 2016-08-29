@@ -1,0 +1,35 @@
+#' kmte: Treatment Effects with Censored Outcomes.
+#'
+#'A R package for implementing all the tests proposed in Sant'Anna (2016b),
+#'"Nonparametric Tests for Treatment Effect Heterogeneity with Censored data",
+#'available at Pedro H.C. Sant'Anna webpage, \url{http://sites.google.com/site/pedrohcsantanna/} .
+#'
+#'In short, up to now this package implement different Kolmogorov-Smirnov and
+#'Cramer-von Mises type tests.
+#'
+#'When the treatment is exogenous, i.e. under the unconfoundedness assumption,
+#'we consider the following null hypotheses:
+#'\enumerate{
+#'   \item Zero conditional distribution treatment effects;
+#'   \item Zero conditional average treatment effects;
+#'   \item Homogeneous conditional average treatment effects.
+#' }
+#'
+#'
+#'When the treatment is endogenous and we have a binary instrument,
+#'i.e. under the local treatment effects setup, we consider the following null hypotheses:
+#'\enumerate{
+#'   \item Zero conditional local distribution treatment effects;
+#'   \item Zero conditional local average treatment effects;
+#'   \item Homogeneous local conditional average treatment effects.
+#' }
+#'
+#' The module was written by Pedro H.C. Sant'Anna (Vanderbilt University).
+#'
+#' A help file with examples will be made available in the near future.
+#' All the treatment effects measures proposed in Sant'Anna (2016a),
+#' "Program Evaluation with Right-Censored Data", will also be added.
+#'
+#' @docType package
+#' @name kmte
+"_PACKAGE"

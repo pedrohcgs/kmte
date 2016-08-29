@@ -1,0 +1,169 @@
+################################################################ This file is used to test the null of zero conditional average treatment effects, as proposed
+################################################################ in the paper 'Nonparametric Tests for Treatment Effect Heterogeneity with Censored data' by
+################################################################ Sant'Anna, Pedro H.C.
+
+################################################################ VERSION : 0.1 MODIFIED : August 27, 2016 at 18:39 AUTHOR : Pedro H. C. Sant'Anna WEBPAGE :
+################################################################ https://sites.google.com/site/pedrohcsantanna/ AFFILIATION : Vanderbilt University.  EMAIL :
+################################################################ pedro.h.santanna@vanderbilt.edu
+
+# out = vector containing the outcome of interest delta = vector containing the censoring
+# indicator (1 if observed, 0 if censored) treat = vector containing the treatment indicator (1
+# if treated, 0 if control) xvector = matrix (or data frame) containing the conditioning
+# covariates xpscore = matrix (or data frame) containing the covariates (and their
+# transformations) to be included in the propensity score estimation b = number of bootstrap
+# draws
+
+#' zcate: Testing for Zero Conditional Average Treatment Effetcs
+#'
+#' \emph{zcate} computes Kolmogorov-Smirnov and Cramer-von Mises type tests
+#' for the null hypothesis of zero conditional average treatment effects.
+#' The test is suitable for both censored and uncensored outcomes, and relies on
+#' the unconfoundedness assumption. For details of the testing procedure, see
+#' Sant'Anna (2016b),'Nonparametric Tests for Treatment Effect Heterogeneity with
+#' Censored data'.
+#'
+#'@param out vector containing the outcome of interest
+#'@param delta vector containing the censoring indicator (1 if observed, 0 if censored)
+#'@param treat vector containing the treatment indicator (1 if treated, 0 if control)
+#'@param xvector matrix (or data frame) containing the conditioning covariates
+#'@param xpscore matrix (or data frame) containing the covariates (and their
+#'               transformations) to be included in the propensity score estimation
+#'@param b number of bootstrap draws
+#'
+#'@return a list containing the Kolmogorov-Smirnov test statistic (kstest),
+#'        the Cramer-von Mises test statistic (cvmtest), and their associated
+#'        bootstrapped p-values, pvks and pvcvm, respectively.
+#'@export
+#'@importFrom stats binomial ecdf glm rbinom
+#'@importFrom MASS ginv
+
+
+
+zcate <- function(out, delta, treat, xvector, xpscore, b) {
+    # first, we merge all the data into a single datafile
+    fulldata <- data.frame(cbind(out, delta, treat, xvector, xpscore))
+    # Compute Kaplan-Meier Weigths - data is now sorted!
+    fulldata <- kmweight(1, 2, fulldata)
+    # Dimension of data matrix fulldata
+    dim.all <- dim(fulldata)[2]
+    # Next, we rename the variable in xpscore to avoid problems Dimension of Xvector
+    dimx <- dim(xvector)[2]
+    # Where it ends
+    dimxe <- 3 + dimx
+    xpscore1 <- fulldata[, ((dimxe + 1):(dim.all - 1))]
+    datascore <- data.frame(y = fulldata[, 3], xpscore1)
+    # estimate the propensity score
+    pscore <- glm(y ~ ., data = datascore, family = binomial("logit"), x = T)
+    fulldata$pscore <- pscore$fit
+
+    # Create id to help on ordering
+    fulldata$id <- 1:length(fulldata[, 1])
+
+    # Dimension of data matrix fulldata
+    dim.all <- dim(fulldata)[2]
+
+    # sample size
+    n.total <- as.numeric(length(fulldata[, 1]))
+    ############################################################################ subset of treated individuals
+    data.treat <- subset(fulldata, fulldata[, 3] == 1)
+    # subset of not-treated individuals
+    data.control <- subset(fulldata, fulldata[, 3] == 0)
+
+    # Compute Kaplan-Meier weigth for treated
+    data.treat <- kmweight(1, 2, data.treat)
+    n.treat <- as.numeric(length(data.treat[, 1]))
+    data.treat$w <- data.treat$w * (n.treat/n.total)
+
+    # Compute Kaplan-Meier weigth for control
+    data.control <- kmweight(1, 2, data.control)
+    n.control <- as.numeric(length(data.control[, 1]))
+    data.control$w <- data.control$w * (n.control/n.total)
+
+    # Let's put everything in a single data - correct KM weigths First, the datasets
+    fulldata <- data.frame(rbind(data.treat, data.control))
+    # Sort wrt id
+    fulldata <- fulldata[order(as.numeric(fulldata[, dim.all])), ]
+
+
+    # Compute the indicators needed for the computation of the test
+    indx <- outer(fulldata[, 4], fulldata[, 4], "<=")
+
+    if (dimx > 1) {
+        for (i in 5:dimxe) {
+            indx <- indx * outer(fulldata[, i], fulldata[, i], "<=")
+        }
+    }
+    ind <- indx
+    rm(indx)
+
+    # We compute the test statistic
+    testdist <- (((fulldata[, 3]/fulldata[, (dim.all - 1)]) - ((1 - fulldata[, 3])/(1 - fulldata[,
+        (dim.all - 1)]))) * fulldata[, 1] * fulldata[, (dim.all - 2)])
+
+    testdist <- matrix(rep(testdist, n.total), n.total)
+    testdist <- testdist * ind
+    testdist <- colSums(testdist)
+
+    kstest <- (n.total^0.5) * max(abs(testdist))
+    cvmtest <- sum(testdist^2)
+
+    ################################################################################################### Necessary ingridients for the #################################### linear represenation and
+    ################################################################################################### #################################### the bootstrap #################################### Compute
+    ################################################################################################### linear representation for these sub-samples
+    linrep.treat <- lr.cate.treated(fulldata = fulldata, subdata = data.treat, dimx = dimx)
+    linrep.control <- lr.cate.control(fulldata = fulldata, subdata = data.control, dimx = dimx)
+
+    # Let's put the linear represenations in a single matrix
+    linrep.tau <- rbind(linrep.treat, -linrep.control)
+    # sort linrep.merged wrt id
+    linrep.tau <- linrep.tau[order(as.numeric(abs(linrep.tau[, 1]))), ]
+    linrep.tau <- linrep.tau[, -1]
+
+    # Remove what we won't need
+    rm(linrep.treat, linrep.control)
+    ################################################################################################### Now, the estimation effect Prepare the matrix
+    matest <- pscore$x
+    # X'X
+    mat1 <- (t(matest)) %*% matest
+    mat1 <- mat1/n.total
+    # (X'X)^-1
+    mat1inv <- ginv(mat1)
+
+    # Compute the terms in the 'Y'
+    wt <- fulldata[, 3]/(fulldata[, (dim.all - 1)]^2)
+    wc <- (1 - fulldata[, 3])/((1 - fulldata[, (dim.all - 1)])^2)
+
+    yest <- (wt + wc) * fulldata[, (dim.all - 2)] * fulldata[, 1]
+    yest <- matrix(rep(yest, n.total), n.total)
+    yest <- yest * ind
+
+    # X'Y
+    xy <- (t(matest)) %*% yest
+
+    # Beta1=(X'X)^-1 (X'Y)
+    beta1 <- mat1inv %*% xy
+
+    # Compute the 'prediction) X*Beta1
+    esteff1 <- matest %*% beta1
+    # Now, compute the estimation effect of the pscore
+    esteff <- fulldata[, 3] - fulldata[, (dim.all - 1)]
+    esteff <- matrix(rep(esteff, n.total), n.total)
+    esteff <- esteff * esteff1
+
+    # Remove what we won't need
+    rm(esteff1, yest)
+    ################################################################################################### Now, we plug in everything to get the linear represenation that we will bootstrap!
+    taudist <- (linrep.tau - esteff)/n.total
+    # taudist=(linrep.tau)/n.total Remove what I won't use
+    rm(esteff)
+    ################################################################################################### Now, the bootstrap Number of bootstrap draws
+    nboot <- b
+
+    tests <- b.km(n.total = n.total, taudist = taudist, nboot = nboot, kstest = kstest, cvmtest = cvmtest)
+    # remove what I do not need
+    rm(taudist)
+
+    # Return these
+    list(kstest = tests$kstest, cvmtest = tests$cvmtest, pvks = tests$pvks, pvcvm = tests$pvcvm)
+}
+
