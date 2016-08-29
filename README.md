@@ -20,6 +20,12 @@ following null hypotheses:
     
     c. Homogeneous local conditional average treatment effects.
 
-The module was written by Pedro H.C. Sant'Anna (Vanderbilt University).
+To install this package, you simply need to run the following two lines of code in R:
+        library(devtools)
+        install_github("pedrohcgs/kmte")
 
 A help file with examples will be made available in the near future. Furthermore, all the treatment effects measures proposed in Sant'Anna (2016a), "Program Evaluation with Right-Censored Data", will also be added.
+
+This package was written by Pedro H. C. Sant'Anna (Vanderbilt University)
+
+
