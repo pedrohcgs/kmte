@@ -1,17 +1,3 @@
-################################################################ This file is used to test the null of zero conditional local average treatment effects, as
-################################################################ proposed in the paper 'Nonparametric Tests for Treatment Effect Heterogeneity with Censored
-################################################################ data', by Sant'Anna, Pedro H.C.
-
-################################################################ VERSION : 0.1 MODIFIED : August 27, 2016 at 18:39 AUTHOR : Pedro H. C. Sant'Anna WEBPAGE :
-################################################################ https://sites.google.com/site/pedrohcsantanna/ AFFILIATION : Vanderbilt University.  EMAIL :
-################################################################ pedro.h.santanna@vanderbilt.edu
-
-# out = vector containing the outcome of interest delta = vector containing the censoring
-# indicator (1 if observed, 0 if censored) treat = vector containing the treatment indicator (1
-# if treated, 0 if control) inst = vector containing the binary instrument xvector = matrix (or
-# data frame) containing the conditioning covariates xpscore = matrix (or data frame) containing
-# the covariates (and their transformations) to be included in the propensity score estimation b
-# = number of bootstrap draws
 
 #' zclate: Testing for Zero Conditional Local Average Treatment Effetcs
 #'
@@ -43,7 +29,7 @@
 zclate <- function(out, delta, treat, inst, xvector, xpscore, b) {
     # first, we merge all the data into a single datafile
     fulldata <- data.frame(cbind(out, delta, treat, inst, xvector, xpscore))
-    ############################################################################ Compute Kaplan-Meier Weigths - data is now sorted!
+    # Compute Kaplan-Meier Weigths - data is now sorted!
     fulldata <- kmweight(1, 2, fulldata)
     # Dimension of data matrix fulldata
     dim.all <- dim(fulldata)[2]
@@ -66,8 +52,7 @@ zclate <- function(out, delta, treat, inst, xvector, xpscore, b) {
 
     # sample size
     n.total <- as.numeric(length(fulldata[, 1]))
-    ############################################################################
-
+    #
     # subset of treated individuals with Z=1
     data.treat.1 <- subset(fulldata, fulldata[, 3] * fulldata[, 4] == 1)
     # subset of treated individuals with Z=0
@@ -135,9 +120,7 @@ zclate <- function(out, delta, treat, inst, xvector, xpscore, b) {
     kstest <- (n.total^0.5) * max(abs(testdist))
     cvmtest <- sum(testdist^2)
 
-    #################################################################################### Necessary ingridients for the #################################### linear represenation and
-    #################################################################################### #################################### the bootstrap #################################### Compute
-    #################################################################################### linear representation for these sub-samples
+    # linear representation for these sub-samples
     linrep.treat.1 <- lr.lcate.z1(fulldata = fulldata, subdata = data.treat.1, dimx = dimx)
     linrep.treat.0 <- lr.lcate.z0(fulldata = fulldata, subdata = data.treat.0, dimx = dimx)
     linrep.control.1 <- lr.lcate.z1(fulldata = fulldata, subdata = data.control.1, dimx = dimx)
@@ -151,7 +134,7 @@ zclate <- function(out, delta, treat, inst, xvector, xpscore, b) {
 
     # Remove what we won't need
     rm(linrep.treat.1, linrep.treat.0, linrep.control.1, linrep.control.0)
-    ########################################################################## Now, the estimation effect Prepare the matrix
+    # Now, the estimation effect Prepare the matrix
     matest <- pscore$x
     # X'X
     mat1 <- (t(matest)) %*% matest
@@ -182,7 +165,7 @@ zclate <- function(out, delta, treat, inst, xvector, xpscore, b) {
 
     # Remove what we won't need
     rm(esteff1, yest)
-    ####################################################################### Now, we plug in everything to get the linear represenation that we will bootstrap!
+    # Now, we plug in everything to get the linear represenation that we will bootstrap!
     taudist <- (linrep.tau - esteff)/n.total
     # taudist=(linrep.tau)/n.total
 
@@ -190,7 +173,7 @@ zclate <- function(out, delta, treat, inst, xvector, xpscore, b) {
 
     # kstest=(n.total^0.5)*max(abs(testdist)) cvmtest=sum(testdist^2) Remove what I won't use
     rm(esteff, ind)
-    ################################################################################## Now, the bootstrap Number of bootstrap draws
+    # Now, the bootstrap Number of bootstrap draws
     nboot <- b
 
     tests <- b.km(n.total = n.total, taudist = taudist, nboot = nboot, kstest = kstest, cvmtest = cvmtest)

@@ -1,17 +1,3 @@
-################################################################ This file is used to test the null of homogeneous conditional average treatment effects, as
-################################################################ proposed in the paper 'Nonparametric Tests for Treatment Effect Heterogeneity with Censored
-################################################################ data', by Sant'Anna, Pedro H.C.
-
-################################################################ VERSION : 0.1 MODIFIED : August 27, 2016 at 18:39 AUTHOR : Pedro H. C. Sant'Anna WEBPAGE :
-################################################################ https://sites.google.com/site/pedrohcsantanna/ AFFILIATION : Vanderbilt University.  EMAIL :
-################################################################ pedro.h.santanna@vanderbilt.edu out = vector containing the outcome of interest delta = vector
-################################################################ containing the censoring indicator (1 if observed, 0 if censored) treat = vector containing the
-################################################################ treatment indicator (1 if treated, 0 if control) xvector = matrix (or data frame) containing
-################################################################ the conditioning covariates xpscore = matrix (or data frame) containing the covariates (and
-################################################################ their transformations) to be included in the propensity score estimation b = number of
-################################################################ bootstrap draws
-
-
 #' hcate: Testing for Homogeneous Conditional Average Treatment Effetcs
 #'
 #' \emph{hcate} computes Kolmogorov-Smirnov and Cramer-von Mises type tests
@@ -61,7 +47,7 @@ hcate <- function(out, delta, treat, xvector, xpscore, b) {
 
     # sample size
     n.total <- as.numeric(length(fulldata[, 1]))
-    ############################################################################ subset of treated individuals
+    # subset of treated individuals
     data.treat <- subset(fulldata, fulldata[, 3] == 1)
     # subset of not-treated individuals
     data.control <- subset(fulldata, fulldata[, 3] == 0)
@@ -109,9 +95,7 @@ hcate <- function(out, delta, treat, xvector, xpscore, b) {
     kstest <- (n.total^0.5) * max(abs(testdist))
     cvmtest <- sum(testdist^2)
 
-    ################################################################################################### Necessary ingridients for the #################################### linear represenation and
-    ################################################################################################### #################################### the bootstrap #################################### Compute
-    ################################################################################################### linear representation for these sub-samples
+    # linear representation for these sub-samples
     linrep.treat <- lr.hom.treated(fulldata = fulldata, subdata = data.treat, dimx = dimx, ate = ate)
 
     linrep.control <- lr.hom.control(fulldata = fulldata, subdata = data.control, dimx = dimx, ate = ate)
@@ -136,7 +120,7 @@ hcate <- function(out, delta, treat, xvector, xpscore, b) {
 
     # Remove what we won't need
     rm(linrep.treat, linrep.control, linrep.unc.treat, linrep.unc.control)
-    ################################################################################################### Now, the estimation effect Prepare the matrix
+    # Now, the estimation effect Prepare the matrix
     matest <- pscore$x
     # X'X
     mat1 <- (t(matest)) %*% matest
@@ -189,7 +173,7 @@ hcate <- function(out, delta, treat, xvector, xpscore, b) {
     # Remove what we won't need
     rm(esteff1.unc, yest.unc, xy.unc, beta1.unc, mat1, matest, mat1inv)
 
-    ################################################################################################### Now, we plug in everything to get the linear represenation that we will bootstrap!
+    # Now, we plug in everything to get the linear represenation that we will bootstrap!
     taudist1 <- (linrep.tau - esteff)
     # taudist1=(linrep.tau)
     fx <- colSums(ind * fulldata[, (dim.all - 2)])
@@ -199,9 +183,9 @@ hcate <- function(out, delta, treat, xvector, xpscore, b) {
     rm(fx)
     taudist <- (taudist1 - taudist.unc)/n.total
     rm(taudist1, taudist.unc, linrep.tau, linrep.unc.tau)
-    ################################################################################################### Remove what I won't use
+    # Remove what I won't use
     rm(esteff, ind, fulldata, data.treat, data.control)
-    ################################################################################################### Now, the bootstrap Number of bootstrap draws
+    # Now, the bootstrap Number of bootstrap draws
     nboot <- b
 
     tests <- b.km(n.total = n.total, taudist = taudist, nboot = nboot, kstest = kstest, cvmtest = cvmtest)

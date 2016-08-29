@@ -1,17 +1,3 @@
-################################################################ This file is used to test the null of zero conditional average treatment effects, as proposed
-################################################################ in the paper 'Nonparametric Tests for Treatment Effect Heterogeneity with Censored data' by
-################################################################ Sant'Anna, Pedro H.C.
-
-################################################################ VERSION : 0.1 MODIFIED : August 27, 2016 at 18:39 AUTHOR : Pedro H. C. Sant'Anna WEBPAGE :
-################################################################ https://sites.google.com/site/pedrohcsantanna/ AFFILIATION : Vanderbilt University.  EMAIL :
-################################################################ pedro.h.santanna@vanderbilt.edu
-
-# out = vector containing the outcome of interest delta = vector containing the censoring
-# indicator (1 if observed, 0 if censored) treat = vector containing the treatment indicator (1
-# if treated, 0 if control) xvector = matrix (or data frame) containing the conditioning
-# covariates xpscore = matrix (or data frame) containing the covariates (and their
-# transformations) to be included in the propensity score estimation b = number of bootstrap
-# draws
 
 #' zcate: Testing for Zero Conditional Average Treatment Effetcs
 #'
@@ -46,14 +32,16 @@ zcate <- function(out, delta, treat, xvector, xpscore, b) {
     fulldata <- kmweight(1, 2, fulldata)
     # Dimension of data matrix fulldata
     dim.all <- dim(fulldata)[2]
-    # Next, we rename the variable in xpscore to avoid problems Dimension of Xvector
+    # Next, we rename the variable in xpscore to avoid problems
+    # Dimension of Xvector
     dimx <- dim(xvector)[2]
     # Where it ends
     dimxe <- 3 + dimx
     xpscore1 <- fulldata[, ((dimxe + 1):(dim.all - 1))]
     datascore <- data.frame(y = fulldata[, 3], xpscore1)
     # estimate the propensity score
-    pscore <- glm(y ~ ., data = datascore, family = binomial("logit"), x = T)
+    pscore <- glm(y ~ ., data = datascore,
+                  family = binomial("logit"), x = T)
     fulldata$pscore <- pscore$fit
 
     # Create id to help on ordering
@@ -64,7 +52,7 @@ zcate <- function(out, delta, treat, xvector, xpscore, b) {
 
     # sample size
     n.total <- as.numeric(length(fulldata[, 1]))
-    ############################################################################ subset of treated individuals
+    # subset of treated individuals
     data.treat <- subset(fulldata, fulldata[, 3] == 1)
     # subset of not-treated individuals
     data.control <- subset(fulldata, fulldata[, 3] == 0)
@@ -79,7 +67,9 @@ zcate <- function(out, delta, treat, xvector, xpscore, b) {
     n.control <- as.numeric(length(data.control[, 1]))
     data.control$w <- data.control$w * (n.control/n.total)
 
-    # Let's put everything in a single data - correct KM weigths First, the datasets
+    # Let's put everything in a single data
+    #correct KM weigths
+    #First, the datasets
     fulldata <- data.frame(rbind(data.treat, data.control))
     # Sort wrt id
     fulldata <- fulldata[order(as.numeric(fulldata[, dim.all])), ]
@@ -97,7 +87,8 @@ zcate <- function(out, delta, treat, xvector, xpscore, b) {
     rm(indx)
 
     # We compute the test statistic
-    testdist <- (((fulldata[, 3]/fulldata[, (dim.all - 1)]) - ((1 - fulldata[, 3])/(1 - fulldata[,
+    testdist <- (((fulldata[, 3]/fulldata[, (dim.all - 1)]) -
+                    ((1 - fulldata[, 3])/(1 - fulldata[,
         (dim.all - 1)]))) * fulldata[, 1] * fulldata[, (dim.all - 2)])
 
     testdist <- matrix(rep(testdist, n.total), n.total)
@@ -107,21 +98,26 @@ zcate <- function(out, delta, treat, xvector, xpscore, b) {
     kstest <- (n.total^0.5) * max(abs(testdist))
     cvmtest <- sum(testdist^2)
 
-    ################################################################################################### Necessary ingridients for the #################################### linear represenation and
-    ################################################################################################### #################################### the bootstrap #################################### Compute
-    ################################################################################################### linear representation for these sub-samples
-    linrep.treat <- lr.cate.treated(fulldata = fulldata, subdata = data.treat, dimx = dimx)
-    linrep.control <- lr.cate.control(fulldata = fulldata, subdata = data.control, dimx = dimx)
+    # Necessary ingridients for the linear represenation and
+    # the bootstrap
+    # Compute linear representation for these sub-samples
+    linrep.treat <- lr.cate.treated(fulldata = fulldata,
+                                    subdata = data.treat,
+                                    dimx = dimx)
+    linrep.control <- lr.cate.control(fulldata = fulldata,
+                                      subdata = data.control,
+                                      dimx = dimx)
 
     # Let's put the linear represenations in a single matrix
     linrep.tau <- rbind(linrep.treat, -linrep.control)
     # sort linrep.merged wrt id
-    linrep.tau <- linrep.tau[order(as.numeric(abs(linrep.tau[, 1]))), ]
+    linrep.tau <- linrep.tau[order(as.numeric(
+                  abs(linrep.tau[, 1]))), ]
     linrep.tau <- linrep.tau[, -1]
 
     # Remove what we won't need
     rm(linrep.treat, linrep.control)
-    ################################################################################################### Now, the estimation effect Prepare the matrix
+    # Now, the estimation effect Prepare the matrix
     matest <- pscore$x
     # X'X
     mat1 <- (t(matest)) %*% matest
@@ -152,18 +148,21 @@ zcate <- function(out, delta, treat, xvector, xpscore, b) {
 
     # Remove what we won't need
     rm(esteff1, yest)
-    ################################################################################################### Now, we plug in everything to get the linear represenation that we will bootstrap!
+    # Now, we plug in everything to get the linear represenation
+    #that we will bootstrap!
     taudist <- (linrep.tau - esteff)/n.total
     # taudist=(linrep.tau)/n.total Remove what I won't use
     rm(esteff)
-    ################################################################################################### Now, the bootstrap Number of bootstrap draws
+    # Now, the bootstrap Number of bootstrap draws
     nboot <- b
 
-    tests <- b.km(n.total = n.total, taudist = taudist, nboot = nboot, kstest = kstest, cvmtest = cvmtest)
+    tests <- b.km(n.total = n.total, taudist = taudist,
+                  nboot = nboot, kstest = kstest, cvmtest = cvmtest)
     # remove what I do not need
     rm(taudist)
 
     # Return these
-    list(kstest = tests$kstest, cvmtest = tests$cvmtest, pvks = tests$pvks, pvcvm = tests$pvcvm)
+    list(kstest = tests$kstest, cvmtest = tests$cvmtest,
+         pvks = tests$pvks, pvcvm = tests$pvcvm)
 }
 
