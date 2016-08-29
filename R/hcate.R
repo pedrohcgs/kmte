@@ -23,7 +23,7 @@
 #'@export
 #'@importFrom stats binomial ecdf glm rbinom
 #'@importFrom MASS ginv
-#'@importFrom parallel makeCluster parLapply stopCluster
+#'@importFrom parallel makeCluster parLapply stopCluster clusterSetRNGStream
 
 hcate <- function(out, delta, treat, xvector, xpscore, b, cores=1) {
     # first, we merge all the data into a single datafile

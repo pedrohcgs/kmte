@@ -24,6 +24,7 @@ b.km.mult <- function(n.total, taudist, nboot, kstest, cvmtest,
   }
 
   cl <- parallel::makeCluster(cores)
+  parallel::clusterSetRNGStream(cl)
   boottests <- parallel::parLapply(cl, 1:nboot, bootapply,
                          n.total, pkappa, k1, k2,
                          taudist)

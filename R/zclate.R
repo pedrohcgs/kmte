@@ -26,7 +26,7 @@
 #'@export
 #'@importFrom stats binomial ecdf glm rbinom
 #'@importFrom MASS ginv
-#'@importFrom parallel makeCluster parLapply stopCluster
+#'@importFrom parallel makeCluster parLapply stopCluster clusterSetRNGStream
 
 
 
