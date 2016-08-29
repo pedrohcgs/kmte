@@ -1,4 +1,3 @@
-
 b.km.mult <- function(n.total, taudist, nboot, kstest, cvmtest,
                       cores) {
   # Use the Mammen(1993) binary V's
