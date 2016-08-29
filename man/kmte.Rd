@@ -6,7 +6,7 @@
 \alias{kmte-package}
 \title{kmte: Treatment Effects with Censored Outcomes.}
 \description{
-A R package for implementing all the tests proposed in Sant'Anna (2016b),
+An R package for implementing all the tests proposed in Sant'Anna (2016b),
 "Nonparametric Tests for Treatment Effect Heterogeneity with Censored data",
 available at Pedro H.C. Sant'Anna webpage, \url{http://sites.google.com/site/pedrohcsantanna/} .
 }
