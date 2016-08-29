@@ -4,7 +4,7 @@
 \alias{zcldte}
 \title{zcldte: Testing for Zero Conditional Local Distribution Treatment Effetcs}
 \usage{
-zcldte(out, delta, treat, inst, xvector, xpscore, b)
+zcldte(out, delta, treat, inst, xvector, xpscore, b, cores = 1)
 }
 \arguments{
 \item{out}{vector containing the outcome of interest}
@@ -21,6 +21,10 @@ zcldte(out, delta, treat, inst, xvector, xpscore, b)
 transformations) to be included in the propensity score estimation}
 
 \item{b}{number of bootstrap draws}
+
+\item{cores}{number of cores to use during the bootstrap (default is 1).
+If cores>1, the bootstrap is conducted using parLapply, instead
+of lapply type call.}
 }
 \value{
 a list containing the Kolmogorov-Smirnov test statistic (kstest),

@@ -15,6 +15,9 @@
 #'@param xpscore matrix (or data frame) containing the covariates (and their
 #'               transformations) to be included in the propensity score estimation
 #'@param b number of bootstrap draws
+#'@param cores number of cores to use during the bootstrap (default is 1).
+#'        If cores>1, the bootstrap is conducted using parLapply, instead
+#'        of lapply type call.
 #'
 #'@return a list containing the Kolmogorov-Smirnov test statistic (kstest),
 #'        the Cramer-von Mises test statistic (cvmtest), and their associated
@@ -22,10 +25,11 @@
 #'@export
 #'@importFrom stats binomial ecdf glm rbinom
 #'@importFrom MASS ginv
+#'@importFrom parallel makeCluster parLapply stopCluster
 
 
 
-zcate <- function(out, delta, treat, xvector, xpscore, b) {
+zcate <- function(out, delta, treat, xvector, xpscore, b, cores=1) {
     # first, we merge all the data into a single datafile
     fulldata <- data.frame(cbind(out, delta, treat, xvector, xpscore))
     # Compute Kaplan-Meier Weigths - data is now sorted!
@@ -156,8 +160,15 @@ zcate <- function(out, delta, treat, xvector, xpscore, b) {
     # Now, the bootstrap Number of bootstrap draws
     nboot <- b
 
-    tests <- b.km(n.total = n.total, taudist = taudist,
+    if (cores==1){
+      tests <- b.km(n.total = n.total, taudist = taudist,
                   nboot = nboot, kstest = kstest, cvmtest = cvmtest)
+    }
+    if (cores>1){
+      tests <- b.km.mult(n.total = n.total, taudist = taudist,
+                    nboot = nboot, kstest = kstest, cvmtest = cvmtest,
+                    cores = cores)
+    }
     # remove what I do not need
     rm(taudist)
 
