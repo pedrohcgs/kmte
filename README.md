@@ -1,5 +1,6 @@
-# kmte
-A R package for implementing all the tests proposed in Sant'Anna (2016), "Nonparametric Tests for Treatment Effect Heterogeneity with Censored data", available at Pedro H.C. Sant'Anna webpage, https://sites.google.com/site/pedrohcsantanna/ .
+# kmte: An R Package for Treatment Effects with Censored Outcomes
+
+As of now, this n R package implements all the tests proposed in Sant'Anna (2016b), "Nonparametric Tests for Treatment Effect Heterogeneity with Censored data", available at Pedro H.C. Sant'Anna webpage, https://sites.google.com/site/pedrohcsantanna/ .
 
 In short, this package implements different Kolmogorov-Smirnov and Cramér–von Mises type tests. 
 
