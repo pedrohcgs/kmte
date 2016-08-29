@@ -6,7 +6,7 @@ b.km <- function(n.total, taudist, nboot, kstest, cvmtest) {
     pkappa <- 0.5 * (1 + 5^0.5)/(5^0.5)
 
     bootapply <- function(nn) {
-        v <- rbinom(n.total, 1, pkappa)
+        v <- stats::rbinom(n.total, 1, pkappa)
         v <- ifelse(v == 1, k1, k2)
         v <- matrix(rep(v, n.total), n.total)
         # Bootstrap tau
@@ -32,5 +32,6 @@ b.km <- function(n.total, taudist, nboot, kstest, cvmtest) {
     pvksb <- sum((boottest[, 1] > kstest))/nboot
     pvcvmb <- sum((boottest[, 2] > cvmtest))/nboot
 
-    list(kstest = kstest, cvmtest = cvmtest, pvks = pvksb, pvcvm = pvcvmb)
+    list(kstest = kstest, cvmtest = cvmtest, pvks = pvksb,
+         pvcvm = pvcvmb)
 }

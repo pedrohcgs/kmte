@@ -165,7 +165,7 @@ hclate <- function(out, delta, treat, inst, xvector, xpscore, b) {
     mat1 <- (t(matest)) %*% matest
     mat1 <- mat1/n.total
     # (X'X)^-1
-    mat1inv <- ginv(mat1)
+    mat1inv <- MASS::ginv(mat1)
 
     # Compute the terms in the 'Y'
     wt <- fulldata[, 4]/(fulldata[, (dim.all - 1)]^2)

@@ -38,7 +38,7 @@ zcdte <- function(out, delta, treat, xvector, xpscore, b) {
     xpscore1 <- fulldata[, ((dimxe + 1):(dim.all - 1))]
     datascore <- data.frame(y = fulldata[, 3], xpscore1)
     # estimate the propensity score
-    pscore <- glm(y ~ ., data = datascore, family = binomial("logit"), x = T)
+    pscore <- stats::glm(y ~ ., data = datascore, family = binomial("logit"), x = T)
     fulldata$pscore <- pscore$fit
 
     # Create id to help on ordering
@@ -114,7 +114,7 @@ zcdte <- function(out, delta, treat, xvector, xpscore, b) {
     mat1 <- (t(matest)) %*% matest
     mat1 <- mat1/n.total
     # (X'X)^-1
-    mat1inv <- ginv(mat1)
+    mat1inv <- MASS::ginv(mat1)
 
     # Compute the terms in the 'Y'
     wt <- fulldata[, 3]/(fulldata[, (dim.all - 1)]^2)

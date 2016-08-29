@@ -15,7 +15,7 @@ lr.lcdte.z0 <- function(fulldata, subdata, dimx) {
         ###########         the bootstrap          ################
         ###########################################################
         # Compute integrand of gamma0
-        h.sub <- ecdf(subdatakm[, 1])
+        h.sub <- stats::ecdf(subdatakm[, 1])
         distq.sub <- h.sub(subdatakm[, 1])
         # Avoid problem of numerator (this is just mechanical,
         # given that the last obs of gamma0 is zero)
