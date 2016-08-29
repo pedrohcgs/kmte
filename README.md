@@ -21,6 +21,7 @@ following null hypotheses:
     c. Homogeneous local conditional average treatment effects.
 
 To install this package, you simply need to run the following two lines of code in R:
+
         library(devtools)
         install_github("pedrohcgs/kmte")
 
