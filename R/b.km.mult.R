@@ -5,8 +5,24 @@ b.km.mult <- function(n.total, taudist, nboot, kstest, cvmtest,
   k2 <- 0.5 * (1 + 5^0.5)
   pkappa <- 0.5 * (1 + 5^0.5)/(5^0.5)
 
+  ## Define seeds
+  if (!is.null(iseed)){
+    seed.temp <- harvestr::gather(nboot, seed = iseed)
+  }
+  if (is.null(iseed)){
+    ss=floor(stats::runif(1)*10000)
+    seed.temp <- harvestr::gather(nboot, seed = ss)
+  }
+
+  Seed <- matrix(nrow = nboot, ncol = 6)
+  for(i in 1:nboot){
+    Seed[i,] <- seed.temp[[i]][2:7]
+  }
+  # Create bootstrap function
   bootapply <- function(nn, n.total, pkappa, k1, k2,
-                        taudist) {
+                        taudist,Seed) {
+    seed.run <- Seed[nn,]
+    set.seed(seed.run, "L'Ecuyer-CMRG") ## to make each run fully reproducible
     v <- stats::rbinom(n.total, 1, pkappa)
     v <- ifelse(v == 1, k1, k2)
     v <- matrix(rep(v, n.total), n.total)
@@ -28,7 +44,7 @@ b.km.mult <- function(n.total, taudist, nboot, kstest, cvmtest,
   }
   boottests <- parallel::parLapply(cl, 1:nboot, bootapply,
                          n.total, pkappa, k1, k2,
-                         taudist)
+                         taudist,Seed)
   parallel::stopCluster(cl)
 
   # Put the Bootstrap resuls in a matrix

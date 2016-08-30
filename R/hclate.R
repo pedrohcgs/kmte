@@ -24,9 +24,10 @@
 #'        the Cramer-von Mises test statistic (cvmtest), and their associated
 #'        bootstrapped p-values, pvks and pvcvm, respectively.
 #'@export
-#'@importFrom stats binomial ecdf glm rbinom
+#'@importFrom stats binomial ecdf glm rbinom runif
 #'@importFrom MASS ginv
 #'@importFrom parallel makeCluster parLapply stopCluster clusterSetRNGStream
+#'@importFrom harvestr gather
 
 
 
