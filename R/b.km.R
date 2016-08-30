@@ -1,5 +1,5 @@
 
-b.km <- function(n.total, taudist, nboot, kstest, cvmtest) {
+b.km <- function(n.total, taudist, nboot, kstest, cvmtest, iseed = NULL) {
     # Use the Mammen(1993) binary V's
     k1 <- 0.5 * (1 - 5^0.5)
     k2 <- 0.5 * (1 + 5^0.5)
@@ -19,6 +19,9 @@ b.km <- function(n.total, taudist, nboot, kstest, cvmtest) {
         cvmb <- sum(testdistb^2)
         # Return both tests
         return(cbind(ksb, cvmb))
+    }
+    if (!is.null(iseed)){
+      set.seed(iseed, kind = "L'Ecuyer")
     }
     boottests <- lapply(1:nboot, bootapply)
 

@@ -1,5 +1,5 @@
 b.km.mult <- function(n.total, taudist, nboot, kstest, cvmtest,
-                      cores) {
+                      cores, iseed = NULL) {
   # Use the Mammen(1993) binary V's
   k1 <- 0.5 * (1 - 5^0.5)
   k2 <- 0.5 * (1 + 5^0.5)
@@ -23,7 +23,9 @@ b.km.mult <- function(n.total, taudist, nboot, kstest, cvmtest,
   }
 
   cl <- parallel::makeCluster(cores)
-  parallel::clusterSetRNGStream(cl)
+  if (!is.null(iseed)){
+    parallel::clusterSetRNGStream(iseed,cl)
+  }
   boottests <- parallel::parLapply(cl, 1:nboot, bootapply,
                          n.total, pkappa, k1, k2,
                          taudist)

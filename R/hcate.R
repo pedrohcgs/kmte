@@ -17,6 +17,8 @@
 #'@param cores number of cores to use during the bootstrap (default is 1).
 #'        If cores>1, the bootstrap is conducted using parLapply, instead
 #'        of lapply type call.
+#'@param iseed set seed for reproducible results. Default is NULL
+#'
 #'@return a list containing the Kolmogorov-Smirnov test statistic (kstest),
 #'        the Cramer-von Mises test statistic (cvmtest), and their associated
 #'        bootstrapped p-values, pvks and pvcvm, respectively.
@@ -25,7 +27,7 @@
 #'@importFrom MASS ginv
 #'@importFrom parallel makeCluster parLapply stopCluster clusterSetRNGStream
 
-hcate <- function(out, delta, treat, xvector, xpscore, b, cores=1) {
+hcate <- function(out, delta, treat, xvector, xpscore, b, cores = 1, iseed = NULL) {
     # first, we merge all the data into a single datafile
     fulldata <- data.frame(cbind(out, delta, treat, xvector, xpscore))
     # Compute Kaplan-Meier Weigths - data is now sorted!
@@ -194,12 +196,12 @@ hcate <- function(out, delta, treat, xvector, xpscore, b, cores=1) {
 
     if (cores==1){
       tests <- b.km(n.total = n.total, taudist = taudist,
-                    nboot = nboot, kstest = kstest, cvmtest = cvmtest)
+                    nboot = nboot, kstest = kstest, cvmtest = cvmtest, iseed = iseed)
     }
     if (cores>1){
       tests <- b.km.mult(n.total = n.total, taudist = taudist,
                          nboot = nboot, kstest = kstest,
-                         cvmtest = cvmtest, cores = cores)
+                         cvmtest = cvmtest, cores = cores, iseed = iseed)
     }
     # remove what I do not need
     rm(taudist)
