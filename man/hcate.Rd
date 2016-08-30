@@ -4,7 +4,7 @@
 \alias{hcate}
 \title{hcate: Testing for Homogeneous Conditional Average Treatment Effetcs}
 \usage{
-hcate(out, delta, treat, xvector, xpscore, b, cores = 1, iseed = NULL)
+hcate(out, delta, treat, xvector, xpscore, b, cores = 1)
 }
 \arguments{
 \item{out}{vector containing the outcome of interest}
@@ -23,8 +23,6 @@ transformations) to be included in the propensity score estimation}
 \item{cores}{number of cores to use during the bootstrap (default is 1).
 If cores>1, the bootstrap is conducted using parLapply, instead
 of lapply type call.}
-
-\item{iseed}{set seed for reproducible results. Default is NULL}
 }
 \value{
 a list containing the Kolmogorov-Smirnov test statistic (kstest),

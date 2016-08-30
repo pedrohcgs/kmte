@@ -4,8 +4,7 @@
 \alias{zclate}
 \title{zclate: Testing for Zero Conditional Local Average Treatment Effetcs}
 \usage{
-zclate(out, delta, treat, inst, xvector, xpscore, b, cores = 1,
-  iseed = NULL)
+zclate(out, delta, treat, inst, xvector, xpscore, b, cores = 1)
 }
 \arguments{
 \item{out}{vector containing the outcome of interest}
@@ -26,8 +25,6 @@ transformations) to be included in the propensity score estimation}
 \item{cores}{number of cores to use during the bootstrap (default is 1).
 If cores>1, the bootstrap is conducted using parLapply, instead
 of lapply type call.}
-
-\item{iseed}{set seed for reproducible results. Default is NULL}
 }
 \value{
 a list containing the Kolmogorov-Smirnov test statistic (kstest),

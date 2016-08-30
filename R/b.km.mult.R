@@ -1,18 +1,13 @@
 b.km.mult <- function(n.total, taudist, nboot, kstest, cvmtest,
-                      cores, iseed = NULL) {
+                      cores) {
   # Use the Mammen(1993) binary V's
   k1 <- 0.5 * (1 - 5^0.5)
   k2 <- 0.5 * (1 + 5^0.5)
   pkappa <- 0.5 * (1 + 5^0.5)/(5^0.5)
 
   ## Define seeds
-  if (!is.null(iseed)){
-    seed.temp <- harvestr::gather(nboot, seed = iseed)
-  }
-  if (is.null(iseed)){
-    ss=floor(stats::runif(1)*10000)
-    seed.temp <- harvestr::gather(nboot, seed = ss)
-  }
+  ss=floor(stats::runif(1)*10000)
+  seed.temp <- harvestr::gather(nboot, seed = ss)
 
   Seed <- matrix(nrow = nboot, ncol = 6)
   for(i in 1:nboot){
@@ -39,9 +34,6 @@ b.km.mult <- function(n.total, taudist, nboot, kstest, cvmtest,
   }
 
   cl <- parallel::makeCluster(cores)
-  if (!is.null(iseed)){
-    parallel::clusterSetRNGStream(cl = cl, iseed)
-  }
   boottests <- parallel::parLapply(cl, 1:nboot, bootapply,
                          n.total, pkappa, k1, k2,
                          taudist,Seed)

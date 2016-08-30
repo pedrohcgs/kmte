@@ -18,7 +18,6 @@
 #'@param cores number of cores to use during the bootstrap (default is 1).
 #'        If cores>1, the bootstrap is conducted using parLapply, instead
 #'        of lapply type call.
-#'@param iseed set seed for reproducible results. Default is NULL
 #'
 #'@return a list containing the Kolmogorov-Smirnov test statistic (kstest),
 #'        the Cramer-von Mises test statistic (cvmtest), and their associated
@@ -26,12 +25,12 @@
 #'@export
 #'@importFrom stats binomial ecdf glm rbinom runif
 #'@importFrom MASS ginv
-#'@importFrom parallel makeCluster parLapply stopCluster clusterSetRNGStream
+#'@importFrom parallel makeCluster parLapply stopCluster
 #'@importFrom harvestr gather
 
 
 
-zcate <- function(out, delta, treat, xvector, xpscore, b, cores = 1, iseed = NULL) {
+zcate <- function(out, delta, treat, xvector, xpscore, b, cores = 1) {
     # first, we merge all the data into a single datafile
     fulldata <- data.frame(cbind(out, delta, treat, xvector, xpscore))
     # Compute Kaplan-Meier Weigths - data is now sorted!
@@ -164,12 +163,12 @@ zcate <- function(out, delta, treat, xvector, xpscore, b, cores = 1, iseed = NUL
 
     if (cores==1){
       tests <- b.km(n.total = n.total, taudist = taudist,
-                    nboot = nboot, kstest = kstest, cvmtest = cvmtest, iseed = iseed)
+                    nboot = nboot, kstest = kstest, cvmtest = cvmtest)
     }
     if (cores>1){
       tests <- b.km.mult(n.total = n.total, taudist = taudist,
                          nboot = nboot, kstest = kstest,
-                         cvmtest = cvmtest, cores = cores, iseed = iseed)
+                         cvmtest = cvmtest, cores = cores)
     }
     # remove what I do not need
     rm(taudist)
