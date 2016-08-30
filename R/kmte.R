@@ -30,6 +30,4 @@
 #' All the treatment effects measures proposed in Sant'Anna (2016a),
 #' "Program Evaluation with Right-Censored Data", will also be added.
 #'
-#' @docType package
-#' @name kmte
-NULL
+"_PACKAGE"

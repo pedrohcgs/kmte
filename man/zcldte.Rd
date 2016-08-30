@@ -2,7 +2,7 @@
 % Please edit documentation in R/zcldte.R
 \name{zcldte}
 \alias{zcldte}
-\title{zcldte: Testing for Zero Conditional Local Distribution Treatment Effetcs}
+\title{zcldte: Testing for Zero Conditional Local Distribution Treatment Effects}
 \usage{
 zcldte(out, delta, treat, inst, xvector, xpscore, b, cores = 1)
 }

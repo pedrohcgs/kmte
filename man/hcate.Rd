@@ -2,7 +2,7 @@
 % Please edit documentation in R/hcate.R
 \name{hcate}
 \alias{hcate}
-\title{hcate: Testing for Homogeneous Conditional Average Treatment Effetcs}
+\title{hcate: Testing for Homogeneous Conditional Average Treatment Effects}
 \usage{
 hcate(out, delta, treat, xvector, xpscore, b, cores = 1)
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/zcdte.R
 \name{zcdte}
 \alias{zcdte}
-\title{zcdte: Testing for Zero Conditional Distribution Treatment Effetcs}
+\title{zcdte: Testing for Zero Conditional Distribution Treatment Effects}
 \usage{
 zcdte(out, delta, treat, xvector, xpscore, b, cores = 1)
 }

@@ -1,5 +1,5 @@
 
-#' zcdte: Testing for Zero Conditional Distribution Treatment Effetcs
+#' zcdte: Testing for Zero Conditional Distribution Treatment Effects
 #'
 #' \emph{zcdte} computes Kolmogorov-Smirnov and Cramer-von Mises type tests
 #' for the null hypothesis of zero conditional distribution treatment effects.

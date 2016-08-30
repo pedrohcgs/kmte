@@ -1,4 +1,4 @@
-#' hclate: Testing for Homogeneous Conditional Local Average Treatment Effetcs
+#' hclate: Testing for Homogeneous Conditional Local Average Treatment Effects
 #'
 #' \emph{hclate} computes Kolmogorov-Smirnov and Cramer-von Mises type tests
 #' for the null hypothesis of homogeneous conditional local average treatment effects.
