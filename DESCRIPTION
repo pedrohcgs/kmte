@@ -11,7 +11,7 @@ Description: Provide several estimators and tests for treatment effects when
     proposed in Sant'Anna (2016a), "Program Evaluation with Right-Censored Data",
     and all the tests proposed in Sant'Anna (2016b),"Nonparametric Tests for
     Treatment Effect Heterogeneity with Censored data".
-URL: \url{https://github.com/pedrohcgs/kmte}
+URL: https://github.com/pedrohcgs/kmte
 Depends:
     R (>= 3.1)
 Imports:
