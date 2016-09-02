@@ -2,6 +2,7 @@
 % Please edit documentation in R/kmte.R
 \docType{package}
 \name{kmte-package}
+\alias{kmte}
 \alias{kmte-package}
 \title{kmte: An R Package for Treatment Effects with Censored Outcomes.}
 \description{
