@@ -2,7 +2,7 @@ Package: kmte
 Type: Package
 Title: An R Package for Treatment Effects with Censored Outcomes
 Version: 0.1.0.901
-Date: 2015-08-29
+Date: 2015-09-5
 Author: Pedro H. C. Sant'Anna
 Maintainer: Pedro H. C. Sant'Anna <pedro.h.santanna@vanderbilt.edu>
 Description: Provide several estimators and tests for treatment effects when
