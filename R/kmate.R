@@ -125,15 +125,25 @@ kmate <- function(out, delta, treat, xpscore, b = 1000, ci = c(0.90,0.95,0.99), 
   #----------------------------------------------------------------------------
   # Compute Counterfactual Average Outcomes, E[Y(1)] and E[Y(0)], and the ATE
   meany1km <- boot.ci(boot.kmate, type="perc", index=1)$t0
-  names(meany1km) <- "E[Y(1)]"
+  names(meany1km) <- "Counterfactual E[Y(1)]"
   meany0km <- boot.ci(boot.kmate, type="perc", index=2)$t0
-  names(meany0km) <- "E[Y(0)]"
+  names(meany0km) <- "Counterfactual E[Y(0)]"
   ate <- boot.ci(boot.kmate, type="perc", index=3)$t0
   names(ate) <- "Average Treatment Effect"
   #----------------------------------------------------------------------------
   #Compute the confidence interval for ate
-  ate.lb <- boot.ci(boot.kmate, type="perc", index=3, conf = ci)$percent[4]
-  ate.ub <- boot.ci(boot.kmate, type="perc", index=3, conf = ci)$percent[5]
+  if (length(ci) == 1){
+    ate.lb <- boot.ci(boot.kmate, type="perc", index=3, conf = ci)$percent[4]
+    ate.ub <- boot.ci(boot.kmate, type="perc", index=3, conf = ci)$percent[5]
+    names(ate.lb) <- paste(ci*100,"% Confidence Interval: Lower Bound", sep="")
+    names(ate.ub) <- paste(ci*100,"% Confidence Interval: Upper Bound", sep="")
+  }
+  if (length(ci) >1){
+  ate.lb <- boot.ci(boot.kmate, type="perc", index=3, conf = ci)$percent[,4]
+  ate.ub <- boot.ci(boot.kmate, type="perc", index=3, conf = ci)$percent[,5]
+  names(ate.lb) <- paste(ci*100,"% Confidence Interval: Lower Bound", sep="")
+  names(ate.ub) <- paste(ci*100,"% Confidence Interval: Upper Bound", sep="")
+  }
   #----------------------------------------------------------------------------
   # Return these
   list(ate = ate,
