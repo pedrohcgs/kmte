@@ -169,8 +169,11 @@ kmqte <- function(out, delta, treat, probs = 0.5,
   if ((n.ci == 1) * (n.probs > 1) == 1){
     qte.lb <- matrix(NA, n.ci, n.probs)
     qte.ub <- matrix(NA, n.ci, n.probs)
-    colnames(qte.lb) <- (names(quantile(1, probs = probs)))
-    colnames(qte.ub) <- paste((names(quantile(1, probs = probs))))
+    colnames(qte.lb) <- paste(names(quantile(1, probs = probs)), "quantile")
+    colnames(qte.ub) <- names(quantile(1, probs = probs))
+
+    rownames(qte.ub) <- names(quantile(1, probs = ci))
+    rownames(qte.lb) <- names(quantile(1, probs = ci))
 
     for (i in 1:n.probs){
       qte.lb[,i] <- boot::boot.ci(boot.kmqte, type="perc",
@@ -183,8 +186,11 @@ kmqte <- function(out, delta, treat, probs = 0.5,
   if ((n.ci > 1) * (n.probs > 1) == 1){
     qte.lb <- matrix(NA, n.ci, n.probs)
     qte.ub <- matrix(NA, n.ci, n.probs)
-    colnames(qte.lb) <- (names(quantile(1, probs = probs)))
+    colnames(qte.lb) <- paste(names(quantile(1, probs = probs)), "quantile")
     colnames(qte.ub) <- paste((names(quantile(1, probs = probs))))
+    rownames(qte.ub) <- names(quantile(1, probs = ci))
+    rownames(qte.lb) <- names(quantile(1, probs = ci))
+
     for (i in 1:n.probs){
       qte.lb[,i] <- boot::boot.ci(boot.kmqte, type="perc",
                                  index = (i+ 2* n.probs), conf = ci)$percent[,4]
