@@ -176,6 +176,8 @@ kmqte <- function(out, delta, treat, probs = 0.5,
       qte.ub[,i] <- boot::boot.ci(boot.kmqte, type="perc",
                           index = (i+ 2* n.probs), conf = ci)$percent[5]
     }
+    colnames(qte.lb) <- names(boot.kmqte$t0)
+    colnames(qte.ub) <- names(boot.kmqte$t0)
   }
 
   if ((n.ci > 1) * (n.probs > 1) == 1){
@@ -188,6 +190,8 @@ kmqte <- function(out, delta, treat, probs = 0.5,
       qte.ub[,i] <- boot::boot.ci(boot.kmqte, type="perc",
                                  index = (i+ 2* n.probs), conf = ci)$percent[,5]
     }
+    colnames(qte.lb) <- names(boot.kmqte$t0)
+    colnames(qte.ub) <- names(boot.kmqte$t0)
   }
 
   #----------------------------------------------------------------------------
@@ -195,7 +199,7 @@ kmqte <- function(out, delta, treat, probs = 0.5,
   list(qte = qte,
        qy1 = qy1,
        qy0 = qy0,
-       boot = boot.kmqte,
+       #boot = boot.kmqte,
        qte.lb = qte.lb,
        qte.ub = qte.ub
   )
