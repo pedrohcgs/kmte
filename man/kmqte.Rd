@@ -5,7 +5,7 @@
 \title{kmate: Two-Step Kaplan-Meier Quantile Treatment Effect}
 \usage{
 kmqte(out, delta, treat, probs = 0.5, xpscore, b = 1000, ci = c(0.9, 0.95,
-  0.99), tau = NA, standardize = TRUE, cores = 1)
+  0.99), standardize = TRUE, cores = 1)
 }
 \arguments{
 \item{out}{vector containing the outcome of interest}
@@ -27,11 +27,6 @@ Propensity score estimation is based on Logit.}
 \item{ci}{A scalar or vector with values in (0,1) containing the confidence level(s)
 of the required interval(s). Default is a vector with
 0,90, 0.95 and 0.99}
-
-\item{tau}{scalar that defined the truncation parameter. Default is NA, which does
-not perform any kind of truncation in the computation of the ATE.
-When tau is different than NA, all outcomes which values greater
-than tau are truncated.}
 
 \item{standardize}{Default is TRUE, which normalizes propensity score weights to
 sum to 1 within each treatment group.

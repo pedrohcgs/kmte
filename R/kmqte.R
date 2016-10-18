@@ -19,10 +19,6 @@
 #'@param ci A scalar or vector with values in (0,1) containing the confidence level(s)
 #'          of the required interval(s). Default is a vector with
 #'          0,90, 0.95 and 0.99
-#'@param tau scalar that defined the truncation parameter. Default is NA, which does
-#'            not perform any kind of truncation in the computation of the ATE.
-#'            When tau is different than NA, all outcomes which values greater
-#'            than tau are truncated.
 #'@param standardize Default is TRUE, which normalizes propensity score weights to
 #'                   sum to 1 within each treatment group.
 #'                    Set to FALSE to return Horvitz-Thompson weights.
@@ -40,14 +36,14 @@
 #-----------------------------------------------------------------------------
 kmqte <- function(out, delta, treat, probs = 0.5,
                   xpscore, b = 1000, ci = c(0.90,0.95,0.99),
-                  tau = NA, standardize = TRUE, cores = 1) {
+                  standardize = TRUE, cores = 1) {
   #-----------------------------------------------------------------------------
   # first, we merge all the data into a single datafile
   fulldata <- data.frame(cbind(out, delta, treat, xpscore))
   #-----------------------------------------------------------------------------
   # Next, we set up the bootstrap function
   boot1.kmqte <- function(fulldata, i, probs1 = probs,
-                          tau1 = tau, standardize1 = standardize){
+                          standardize1 = standardize){
     #----------------------------------------------------------------------------
     # Select the data for the bootstrap (like the original data)
     df.b=fulldata[i,]
