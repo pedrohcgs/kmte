@@ -105,21 +105,23 @@ kmqte <- function(out, delta, treat, probs = 0.5,
     kmcdf.y0 <- w.ecdf(df.b$out, w0km.b)
 
     # Next, we rearrange these distributions
-    kmcdf.y1.r <- Rearrangement::rearrangement(data.frame(df.b$out),
-                                               kmcdf.y1(df.b$out))
-    kmcdf.y1.r[kmcdf.y1.r > 1] <- 1
-    kmcdf.y1.r[kmcdf.y1.r < 0] <- 0
-    kmcdf.y1.r <- r.ecdf(df.b$out, kmcdf.y1.r)
+    #kmcdf.y1.r <- Rearrangement::rearrangement(data.frame(df.b$out),
+    #                                           kmcdf.y1(df.b$out))
+    #kmcdf.y1.r[kmcdf.y1.r > 1] <- 1
+    #kmcdf.y1.r[kmcdf.y1.r < 0] <- 0
+    #kmcdf.y1.r <- r.ecdf(df.b$out, kmcdf.y1.r)
 
-    kmcdf.y0.r <- Rearrangement::rearrangement(data.frame(df.b$out),
-                                               kmcdf.y0(df.b$out))
-    kmcdf.y0.r[kmcdf.y0.r > 1] <- 1
-    kmcdf.y0.r[kmcdf.y0.r<0] <- 0
-    kmcdf.y0.r <- r.ecdf(df.b$out, kmcdf.y0.r)
+    #kmcdf.y0.r <- Rearrangement::rearrangement(data.frame(df.b$out),
+    #                                           kmcdf.y0(df.b$out))
+    #kmcdf.y0.r[kmcdf.y0.r > 1] <- 1
+    #kmcdf.y0.r[kmcdf.y0.r<0] <- 0
+    #kmcdf.y0.r <- r.ecdf(df.b$out, kmcdf.y0.r)
 
     #quantiles of y1 and y0, and qte
-    qy1 <- stats::quantile(kmcdf.y1.r, type = 1, probs = probs1)
-    qy0 <- stats::quantile(kmcdf.y0.r, type = 1, probs = probs1)
+    #qy1 <- stats::quantile(kmcdf.y1.r, type = 1, probs = probs1)
+    #qy0 <- stats::quantile(kmcdf.y0.r, type = 1, probs = probs1)
+    qy1 <- stats::quantile(kmcdf.y1, type = 1, probs = probs1)
+    qy0 <- stats::quantile(kmcdf.y1, type = 1, probs = probs1)
 
     qte <- qy1 - qy0
     #-----------------------------------------------------------------------------

@@ -1,28 +1,28 @@
 #Function to compute weigthed cdfs
 w.ecdf=function(q,w){
-  n=length(q)
+  n <- length(q)
   if (n < 1)
     stop("'q' must have 1 or more non-missing values")
-  if (all(q==sort(q))==FALSE)
+  if (all(q == sort(q)) == FALSE)
     stop ("'q' must be sorted beforehand")
-  if (n!=length(w))
+  if (n != length(w))
     stop ("'q' and 'w' must have the same length")
-  if (min(w)<0)
+  if (min(w) < 0)
     stop ("'w' must be non-negative")
-  if (max(w)>1)
+  if (max(w) > 1)
     stop ("'w' must be not greater than 1")
 
-  vals=unique(q)
+  vals <- unique(q)
   if (anyDuplicated(q)) {
-    w=tapply(w, q, sum)
+    w <- tapply(w, q, sum)
   }
-  fn=cumsum(w)
-  fn[fn>1]=1
-  rval=approxfun(vals, fn,
+  fn <- cumsum(w)
+  fn[fn>1] <- 1
+  rval <- stats::approxfun(vals, fn,
                  method = "constant", yleft = 0,
                  yright = 1, f = 0, ties = "ordered")
-  class(rval)=c("ecdf", "stepfun", class(rval))
+  class(rval) <- c("ecdf", "stepfun", class(rval))
   assign("nobs", n, envir = environment(rval))
-  attr(rval, "call")= sys.call()
+  attr(rval, "call") <- sys.call()
   rval
 }
