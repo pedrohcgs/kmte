@@ -119,13 +119,12 @@ kmqte <- function(out, delta, treat, probs = 0.5,
 
     #quantiles of y1 and y0
     qy1=quantile(kmcdf.y1.r, type = 1, probs = probs1)
-    qy0=quantile(kmcdf.y0.r, type = 1, prob = probs1)
+    qy0=quantile(kmcdf.y0.r, type = 1, probs = probs1)
 
 
     qte <- qy1 - qy0
     #-----------------------------------------------------------------------------
-    #return(cbind(qy1, qy0, qte))
-    return(cbind(kmcdf.y1.r, kmcdf.y0.r))
+    return(rbind(qy1, qy0, qte))
   }
   #-----------------------------------------------------------------------------
   # Number of bootstrap draws
@@ -145,34 +144,32 @@ kmqte <- function(out, delta, treat, probs = 0.5,
   }
   #----------------------------------------------------------------------------
   # Compute Counterfactual quantiles and the QTE
-  #qy1 <- boot.ci(boot.kmqte, type="perc", index=1)$t0
+  qy1 <- boot.ci(boot.kmqte, type="perc", index=1)$t0
   #names(qy1) <- paste("Counterfactual ", probs, "-quantile for treated", sep="")
-  #qy0 <- boot.ci(boot.kmqte, type="perc", index=2)$t0
+  qy0 <- boot.ci(boot.kmqte, type="perc", index=2)$t0
   #names(qy0) <- paste("Counterfactual", probs, "quantile for control", sep="")
-  #qte <- boot.ci(boot.kmqte, type="perc", index=3)$t0
+  qte <- boot.ci(boot.kmqte, type="perc", index=3)$t0
  # names(qte) <- paste(probs, "-quantile treatment effect", sep="")
   #----------------------------------------------------------------------------
   #Compute the confidence interval for qte
-  #if (length(ci) == 1){
-  #  qte.lb <- boot.ci(boot.kmqte, type="perc", index=3, conf = ci)$percent[4]
-  #  qte.ub <- boot.ci(boot.kmqte, type="perc", index=3, conf = ci)$percent[5]
-  #  names(qte.lb) <- paste(ci*100,"% Confidence Interval: Lower Bound", sep="")
-  #  names(qte.ub) <- paste(ci*100,"% Confidence Interval: Upper Bound", sep="")
-  #}
-  #if (length(ci) >1){
-  #  qte.lb <- boot.ci(boot.kmqte, type="perc", index=3, conf = ci)$percent[,4]
-  #  qte.ub <- boot.ci(boot.kmqte, type="perc", index=3, conf = ci)$percent[,5]
-  #  names(qte.lb) <- paste(ci*100,"% Confidence Interval: Lower Bound", sep="")
-  #  names(qte.ub) <- paste(ci*100,"% Confidence Interval: Upper Bound", sep="")
-  #}
+  if (length(ci) == 1){
+    qte.lb <- boot.ci(boot.kmqte, type="perc", index=3, conf = ci)$percent[4]
+    qte.ub <- boot.ci(boot.kmqte, type="perc", index=3, conf = ci)$percent[5]
+    names(qte.lb) <- paste(ci*100,"% Confidence Interval: Lower Bound", sep="")
+    names(qte.ub) <- paste(ci*100,"% Confidence Interval: Upper Bound", sep="")
+  }
+  if (length(ci) >1){
+    qte.lb <- boot.ci(boot.kmqte, type="perc", index=3, conf = ci)$percent[,4]
+    qte.ub <- boot.ci(boot.kmqte, type="perc", index=3, conf = ci)$percent[,5]
+    names(qte.lb) <- paste(ci*100,"% Confidence Interval: Lower Bound", sep="")
+    names(qte.ub) <- paste(ci*100,"% Confidence Interval: Upper Bound", sep="")
+  }
   #----------------------------------------------------------------------------
   # Return these
-  #list(qte = qte,
-  #     qy1 = qy1,
-  #     qy0 = qy0,
+  list(qte = qte,
+       qy1 = qy1,
+       qy0 = qy0,
        #boot = boot.kmqte,
-  #     qte.lb = qte.lb,
-  #     qte.ub = qte.ub)
-  list(bb = boot.kmqte)
+       qte.lb = qte.lb,
+       qte.ub = qte.ub)
 }
-
