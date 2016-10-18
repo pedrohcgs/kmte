@@ -44,12 +44,10 @@ kmate <- function(out, delta, treat, xpscore, b = 1000, ci = c(0.90,0.95,0.99),
     # Select the data for the bootstrap (like the original data)
     df.b=fulldata[i,]
     #----------------------------------------------------------------------------
-    # Compute Kaplan-Meier Weigths - data is now sorted!
-    df.b <- kmweight(1, 2, df.b)
     # Dimension of data matrix df.b
     dim.b <- dim(df.b)[2]
     # Next, we rename the variable in xpscore to avoid problems
-    xpscore1.b <- df.b[, (4:(dim.b - 1))]
+    xpscore1.b <- df.b[, (4:dim.b)]
     datascore.b <- data.frame(y = df.b[, 3], xpscore1.b)
     #-----------------------------------------------------------------------------
     # estimate the propensity score
@@ -80,11 +78,7 @@ kmate <- function(out, delta, treat, xpscore, b = 1000, ci = c(0.90,0.95,0.99),
     data.control.b$w <- data.control.b$w * (n.control.b/n.total.b)
     #-----------------------------------------------------------------------------
     # Let's put everything in a single data
-    # correct KM weigths
-    # First, the datasets
     df.b <- data.frame(rbind(data.treat.b, data.control.b))
-    # Sort wrt id
-    df.b <- df.b[order(as.numeric(df.b[, dim.all])), ]
     #-----------------------------------------------------------------------------
     # Compute weigths for treatment and control groups
     w1km.b <- ((df.b$treat * df.b$w) / df.b$pscore)
@@ -137,15 +131,14 @@ kmate <- function(out, delta, treat, xpscore, b = 1000, ci = c(0.90,0.95,0.99),
   if (length(ci) == 1){
     ate.lb <- boot.ci(boot.kmate, type="perc", index=3, conf = ci)$percent[4]
     ate.ub <- boot.ci(boot.kmate, type="perc", index=3, conf = ci)$percent[5]
-    names(ate.lb) <- paste(ci*100,"% Confidence Interval: Lower Bound", sep="")
-    names(ate.ub) <- paste(ci*100,"% Confidence Interval: Upper Bound", sep="")
   }
   if (length(ci) >1){
   ate.lb <- boot.ci(boot.kmate, type="perc", index=3, conf = ci)$percent[,4]
   ate.ub <- boot.ci(boot.kmate, type="perc", index=3, conf = ci)$percent[,5]
-  names(ate.lb) <- paste(ci*100,"% Confidence Interval: Lower Bound", sep="")
-  names(ate.ub) <- paste(ci*100,"% Confidence Interval: Upper Bound", sep="")
   }
+
+  rownames(ate.ub) <- paste(names(quantile(1, probs = ci)), 'CI: UB')
+  rownames(ate.lb) <- paste(names(quantile(1, probs = ci)), 'CI: LB')
   #----------------------------------------------------------------------------
   # Return these
   list(ate = ate,
