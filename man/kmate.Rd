@@ -4,8 +4,8 @@
 \alias{kmate}
 \title{kmate: Two-Step Kaplan-Meier Average Treatment Effect}
 \usage{
-kmate(out, delta, treat, xpscore, b = 1000, ci = 0.95, tau = NA,
-  standardize = TRUE, cores = 1)
+kmate(out, delta, treat, xpscore, b = 1000, ci = c(0.9, 0.95, 0.99),
+  tau = NA, standardize = TRUE, cores = 1)
 }
 \arguments{
 \item{out}{vector containing the outcome of interest}
@@ -20,7 +20,9 @@ Propensity score estimation is based on Logit.}
 
 \item{b}{The number of bootstrap replicates to be performed. Default is 1,000.}
 
-\item{ci}{A scalar or vector containing the confidence level(s) of the required interval(s). Default is 0.95.}
+\item{ci}{A scalar or vector with values in (0,1) containing the confidence level(s)
+of the required interval(s). Default is a vector with
+0,90, 0.95 and 0.99}
 
 \item{tau}{scalar that defined the truncation parameter. Default is NA, which does not perform any kind of
 truncation in the computation of the ATE. When tau is different than NA, all outcomes which values greater

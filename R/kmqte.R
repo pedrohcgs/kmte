@@ -1,9 +1,9 @@
-#' kmate: Two-Step Kaplan-Meier Average Treatment Effect
+#' kmate: Two-Step Kaplan-Meier Quantile Treatment Effect
 #'
-#' \emph{kmate} computes the Average Treatment Effect for possibly right-censored outcomes.
-#' The estimator relies on the unconfoundedness assumption, and on estimating the propensity score.
-#' For details of the estimation procedure, see Sant'Anna (2016a), 'Program Evaluation with
-#' Right-Censored Data'.
+#' \emph{kmqte} computes the Quantile Treatment Effect for possibly right-censored
+#' outcomes. The estimator relies on the unconfoundedness assumption, and on
+#' estimating the propensity score. For details of the estimation procedure, see
+#' Sant'Anna (2016a), 'Program Evaluation with Right-Censored Data'.
 #'
 #'
 #'@param out vector containing the outcome of interest
@@ -12,33 +12,42 @@
 #'@param xpscore matrix (or data frame) containing the covariates (and their
 #'               transformations) to be included in the propensity score estimation.
 #'               Propensity score estimation is based on Logit.
+#'@param probs   scalar or vector of probabilities with values in (0,1) for which
+#'               the quantile treatment effect is computed. Default is 0.5, returning
+#'               the median.
 #'@param b 	The number of bootstrap replicates to be performed. Default is 1,000.
 #'@param ci A scalar or vector with values in (0,1) containing the confidence level(s)
 #'          of the required interval(s). Default is a vector with
 #'          0,90, 0.95 and 0.99
-#'@param tau scalar that defined the truncation parameter. Default is NA, which does not perform any kind of
-#'            truncation in the computation of the ATE. When tau is different than NA, all outcomes which values greater
+#'@param tau scalar that defined the truncation parameter. Default is NA, which does
+#'            not perform any kind of truncation in the computation of the ATE.
+#'            When tau is different than NA, all outcomes which values greater
 #'            than tau are truncated.
-#'@param standardize Default is TRUE, which normalizes propensity score weights to sum to 1 within each treatment group.
+#'@param standardize Default is TRUE, which normalizes propensity score weights to
+#'                   sum to 1 within each treatment group.
 #'                    Set to FALSE to return Horvitz-Thompson weights.
 #'@param cores number of processesors to be used during the bootstrap (default is 1).
 #'        If cores>1, the bootstrap is conducted using snow
 #'
-#'@return a list containing the Average treatment effect estimate, ate,
+#'@return a list containing the quantile treatment effect estimate, qte,
 #'        its associated bootstrapped values, b.ate, and the \emph{ci} confidence
 #'        confidence interval, l.ate (lower bound), and u.ate (upper bound).
 #'@export
 #'@importFrom stats glm
 #'@importFrom parallel makeCluster stopCluster clusterExport
 #'@importFrom boot boot.ci boot
+#'@importFrom Rearrangement rearrangement
 #-----------------------------------------------------------------------------
-kmate <- function(out, delta, treat, xpscore, b = 1000, ci = c(0.90,0.95,0.99), tau = NA, standardize = TRUE, cores = 1) {
+kmqte <- function(out, delta, treat, probs = 0.5,
+                  xpscore, b = 1000, ci = c(0.90,0.95,0.99),
+                  tau = NA, standardize = TRUE, cores = 1) {
   #-----------------------------------------------------------------------------
   # first, we merge all the data into a single datafile
   fulldata <- data.frame(cbind(out, delta, treat, xpscore))
   #-----------------------------------------------------------------------------
   # Next, we set up the bootstrap function
-  boot1.kmate <- function(fulldata, i, tau1 = tau, standardize1 = standardize){
+  boot1.kmqte <- function(fulldata, i, probs1 = probs,
+                          tau1 = tau, standardize1 = standardize){
     #----------------------------------------------------------------------------
     # Select the data for the bootstrap (like the original data)
     df.b=fulldata[i,]
@@ -94,18 +103,32 @@ kmate <- function(out, delta, treat, xpscore, b = 1000, ci = c(0.90,0.95,0.99), 
       w0km.b <- w0km.b / mean((1 - df.b$treat) / (1 - df.b$pscore))
     }
     #-----------------------------------------------------------------------------
-    # Compute Counterfactual Average Outcomes, E[Y(1)] and E[Y(0)], and the ATE
-    meany1km <- sum(w1km.b * df.b$out)
-    meany0km <- sum(w0km.b * df.b$out)
+    # Compute Counterfactual quantiles, and the QTE
+    # First, we KM estimates of the potential outcomes distribution
+    kmcdf.y1 <- w.ecdf(df.b$out, w1km.b)
+    kmcdf.y0 <- w.ecdf(df.b$out, w0km.b)
 
-    if (is.na(tau1) == FALSE){
-      meany1km <- sum(w1km.b * df.b$out * (df.b$out <= tau1))
-      meany0km <- sum(w0km.b * df.b$out * (df.b$out <= tau1))
-    }
+    # Next, we rearrange these distributions
+    kmcdf.y1.r <- Rearrangement::rearrangement(data.frame(df.b$out),
+                                               kmcdf.y1(df.b$out))
+    kmcdf.y1.r[kmcdf.y1.r > 1] <- 1
+    kmcdf.y1.r[kmcdf.y1.r < 0] <- 0
+    kmcdf.y1.r <- r.ecdf(df.b$out, kmcdf.y1.r)
 
-    ate <- meany1km - meany0km
+    kmcdf.y0.r <- Rearrangement::rearrangement(data.frame(df.b$out),
+                                               kmcdf.y0(df.b$out))
+    kmcdf.y0.r[kmcdf.y0.r > 1] <- 1
+    kmcdf.y0.r[kmcdf.y0.r<0] <- 0
+    kmcdf.y0.r <- r.ecdf(df.b$out, kmcdf.y0.r)
+
+    #quantiles of y1 and y0
+    qy1=quantile(kmcdf.y1.r, type = 1, probs = probs1)
+    qy0=quantile(kmcdf.y0.r, type = 1, prob = probs1)
+
+
+    qte <- qy1 - qy0
     #-----------------------------------------------------------------------------
-    return(cbind(meany1km, meany0km, ate))
+    return(cbind(qy1, qy0, qte))
   }
   #-----------------------------------------------------------------------------
   # Number of bootstrap draws
@@ -113,44 +136,44 @@ kmate <- function(out, delta, treat, xpscore, b = 1000, ci = c(0.90,0.95,0.99), 
   #----------------------------------------------------------------------------
   #COmput the bootstrap
   if (cores == 1){
-    boot.kmate <- boot::boot(fulldata, boot1.kmate, R = nboot)
+    boot.kmqte <- boot::boot(fulldata, boot1.kmaqte, R = nboot)
   }
   if (cores > 1){
     cl <- parallel::makeCluster(cores)
     #clusterExport(cl, "kmweight")
     parallel::clusterSetRNGStream(cl)
-    boot.kmate <- boot::boot(fulldata, boot1.kmate, R = nboot, parallel = "snow", ncpus = cores)
+    boot.kmqte <- boot::boot(fulldata, boot1.kmqte, R = nboot, parallel = "snow",
+                             ncpus = cores)
     parallel::stopCluster(cl)
   }
-
   #----------------------------------------------------------------------------
-  # Compute Counterfactual Average Outcomes, E[Y(1)] and E[Y(0)], and the ATE
-  meany1km <- boot.ci(boot.kmate, type="perc", index=1)$t0
-  names(meany1km) <- "Counterfactual E[Y(1)]"
-  meany0km <- boot.ci(boot.kmate, type="perc", index=2)$t0
-  names(meany0km) <- "Counterfactual E[Y(0)]"
-  ate <- boot.ci(boot.kmate, type="perc", index=3)$t0
-  names(ate) <- "Average Treatment Effect"
+  # Compute Counterfactual quantiles and the QTE
+  qy1 <- boot.ci(boot.kmqte, type="perc", index=1)$t0
+  names(qy1) <- paste("Counterfactual ", ci, "-quantile for treated", sep="")
+  qy0 <- boot.ci(boot.kmqte, type="perc", index=2)$t0
+  names(qy0) <- paste("Counterfactual", ci, "quantile for control", sep="")
+  qte <- boot.ci(boot.kmqte, type="perc", index=3)$t0
+  names(qte) <- paste(ci, "-quantile treatment effect", sep="")
   #----------------------------------------------------------------------------
-  #Compute the confidence interval for ate
+  #Compute the confidence interval for qte
   if (length(ci) == 1){
-    ate.lb <- boot.ci(boot.kmate, type="perc", index=3, conf = ci)$percent[4]
-    ate.ub <- boot.ci(boot.kmate, type="perc", index=3, conf = ci)$percent[5]
-    names(ate.lb) <- paste(ci*100,"% Confidence Interval: Lower Bound", sep="")
-    names(ate.ub) <- paste(ci*100,"% Confidence Interval: Upper Bound", sep="")
+    qte.lb <- boot.ci(boot.kmqte, type="perc", index=3, conf = ci)$percent[4]
+    qte.ub <- boot.ci(boot.kmqte, type="perc", index=3, conf = ci)$percent[5]
+    names(qte.lb) <- paste(ci*100,"% Confidence Interval: Lower Bound", sep="")
+    names(qte.ub) <- paste(ci*100,"% Confidence Interval: Upper Bound", sep="")
   }
   if (length(ci) >1){
-  ate.lb <- boot.ci(boot.kmate, type="perc", index=3, conf = ci)$percent[,4]
-  ate.ub <- boot.ci(boot.kmate, type="perc", index=3, conf = ci)$percent[,5]
-  names(ate.lb) <- paste(ci*100,"% Confidence Interval: Lower Bound", sep="")
-  names(ate.ub) <- paste(ci*100,"% Confidence Interval: Upper Bound", sep="")
+    qte.lb <- boot.ci(boot.kmqte, type="perc", index=3, conf = ci)$percent[,4]
+    qte.ub <- boot.ci(boot.kmqte, type="perc", index=3, conf = ci)$percent[,5]
+    names(qte.lb) <- paste(ci*100,"% Confidence Interval: Lower Bound", sep="")
+    names(qte.ub) <- paste(ci*100,"% Confidence Interval: Upper Bound", sep="")
   }
   #----------------------------------------------------------------------------
   # Return these
-  list(ate = ate,
-       meany1 = meany1km,
-       meany0 = meany0km,
-       #boot = boot.kmate,
-       ate.lb = ate.lb,
-       ate.ub = ate.ub)
+  list(qte = qte,
+       qy1 = qy1,
+       qy0 = qy0,
+       #boot = boot.kmqte,
+       qte.lb = qte.lb,
+       qte.ub = qte.ub)
 }

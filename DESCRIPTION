@@ -19,7 +19,8 @@ Imports:
     stats,
     parallel,
     harvestr,
-    boot
+    boot,
+    Rearrangement
 License: GPL-2
 LazyData: TRUE
 RoxygenNote: 5.0.1
