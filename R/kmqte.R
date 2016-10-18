@@ -166,15 +166,27 @@ kmqte <- function(out, delta, treat, probs = 0.5,
     qte.ub <- boot::boot.ci(boot.kmqte, type="perc", index = 3, conf = ci)$percent[,5]
   }
 
-  if ((n.ci == 1) * (n.probs > 1) ==1){
-    qte.lb <- rep(NA, n.probs)
-    qte.ub <- rep(NA, n.probs)
+  if ((n.ci == 1) * (n.probs > 1) == 1){
+    qte.lb <- matrix(NA, n.ci, n.probs)
+    qte.ub <- matrix(NA, n.ci, n.probs)
 
     for (i in 1:n.probs){
-      qte.lb[i] <- boot::boot.ci(boot.kmqte, type="perc",
+      qte.lb[,i] <- boot::boot.ci(boot.kmqte, type="perc",
                           index = (i+ 2* n.probs), conf = ci)$percent[4]
-      qte.lb[i] <- boot::boot.ci(boot.kmqte, type="perc",
+      qte.ub[,i] <- boot::boot.ci(boot.kmqte, type="perc",
                           index = (i+ 2* n.probs), conf = ci)$percent[5]
+    }
+  }
+
+  if ((n.ci > 1) * (n.probs > 1) == 1){
+    qte.lb <- matrix(NA, n.ci, n.probs)
+    qte.ub <- matrix(NA, n.ci, n.probs)
+
+    for (i in 1:n.probs){
+      qte.lb[,i] <- boot::boot.ci(boot.kmqte, type="perc",
+                                 index = (i+ 2* n.probs), conf = ci)$percent[,4]
+      qte.ub[,i] <- boot::boot.ci(boot.kmqte, type="perc",
+                                 index = (i+ 2* n.probs), conf = ci)$percent[,5]
     }
   }
 
