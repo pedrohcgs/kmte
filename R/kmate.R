@@ -137,6 +137,8 @@ kmate <- function(out, delta, treat, xpscore, b = 1000, ci = c(0.90,0.95,0.99),
   ate.ub <- boot.ci(boot.kmate, type="perc", index=3, conf = ci)$percent[,5]
   }
 
+  ate.lb <- matrix(ate.lb,length(ci),1)
+  ate.ub <- matrix(ate.ub,length(ci),1)
   rownames(ate.ub) <- paste(names(quantile(1, probs = ci)), 'CI: UB')
   rownames(ate.lb) <- paste(names(quantile(1, probs = ci)), 'CI: LB')
   #----------------------------------------------------------------------------
