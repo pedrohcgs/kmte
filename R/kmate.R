@@ -16,9 +16,9 @@
 #'@param ci A scalar or vector with values in (0,1) containing the confidence level(s)
 #'          of the required interval(s). Default is a vector with
 #'          0,90, 0.95 and 0.99
-#'@param tau scalar that defined the truncation parameter. Default is NA, which does not perform any kind of
-#'            truncation in the computation of the ATE. When tau is different than NA, all outcomes which values greater
-#'            than tau are truncated.
+#'@param trunc scalar that defined the truncation parameter. Default is NA, which does not perform any kind of
+#'            truncation in the computation of the ATE. When trunc is different than NA, all outcomes which values greater
+#'            than trunc are truncated.
 #'@param standardize Default is TRUE, which normalizes propensity score weights to sum to 1 within each treatment group.
 #'                    Set to FALSE to return Horvitz-Thompson weights.
 #'@param cores number of processesors to be used during the bootstrap (default is 1).
@@ -32,13 +32,14 @@
 #'@importFrom parallel makeCluster stopCluster clusterExport
 #'@importFrom boot boot.ci boot
 #-----------------------------------------------------------------------------
-kmate <- function(out, delta, treat, xpscore, b = 1000, ci = c(0.90,0.95,0.99), tau = NA, standardize = TRUE, cores = 1) {
+kmate <- function(out, delta, treat, xpscore, b = 1000, ci = c(0.90,0.95,0.99),
+                  trunc = NA, standardize = TRUE, cores = 1) {
   #-----------------------------------------------------------------------------
   # first, we merge all the data into a single datafile
   fulldata <- data.frame(cbind(out, delta, treat, xpscore))
   #-----------------------------------------------------------------------------
   # Next, we set up the bootstrap function
-  boot1.kmate <- function(fulldata, i, tau1 = tau, standardize1 = standardize){
+  boot1.kmate <- function(fulldata, i, trunc1 = trunc, standardize1 = standardize){
     #----------------------------------------------------------------------------
     # Select the data for the bootstrap (like the original data)
     df.b=fulldata[i,]
@@ -98,9 +99,9 @@ kmate <- function(out, delta, treat, xpscore, b = 1000, ci = c(0.90,0.95,0.99), 
     meany1km <- sum(w1km.b * df.b$out)
     meany0km <- sum(w0km.b * df.b$out)
 
-    if (is.na(tau1) == FALSE){
-      meany1km <- sum(w1km.b * df.b$out * (df.b$out <= tau1))
-      meany0km <- sum(w0km.b * df.b$out * (df.b$out <= tau1))
+    if (is.na(trunc1) == FALSE){
+      meany1km <- sum(w1km.b * df.b$out * (df.b$out <= trunc1))
+      meany0km <- sum(w0km.b * df.b$out * (df.b$out <= trunc1))
     }
 
     ate <- meany1km - meany0km
