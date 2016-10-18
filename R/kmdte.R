@@ -1,6 +1,6 @@
-#' kmqte: Two-Step Kaplan-Meier Quantile Treatment Effect
+#' kmdte: Two-Step Kaplan-Meier Distributional Treatment Effect
 #'
-#' \emph{kmqte} computes the Quantile Treatment Effect for possibly right-censored
+#' \emph{kmdte} computes the Distributional Treatment Effect for possibly right-censored
 #' outcomes. The estimator relies on the unconfoundedness assumption, and on
 #' estimating the propensity score. For details of the estimation procedure, see
 #' Sant'Anna (2016a), 'Program Evaluation with Right-Censored Data'.
@@ -12,9 +12,9 @@
 #'@param xpscore matrix (or data frame) containing the covariates (and their
 #'               transformations) to be included in the propensity score estimation.
 #'               Propensity score estimation is based on Logit.
-#'@param probs   scalar or vector of probabilities with values in (0,1) for which
-#'               the quantile treatment effect is computed. Default is 0.5, returning
-#'               the median.
+#'@param ysup   scalar or vector of points for which
+#'               the distributional treatment effect is computed. If NULL,
+#'               all uncensored data points available are used.
 #'@param b 	The number of bootstrap replicates to be performed. Default is 1,000.
 #'@param ci A scalar or vector with values in (0,1) containing the confidence level(s)
 #'          of the required interval(s). Default is a vector with
@@ -25,24 +25,30 @@
 #'@param cores number of processesors to be used during the bootstrap (default is 1).
 #'        If cores>1, the bootstrap is conducted using snow
 #'
-#'@return a list containing the quantile treatment effect estimate, qte,
+#'@return a list containing the distributional treatment effect estimate, dte,
 #'        and the bootstrapped \emph{ci} confidence
-#'        confidence interval, qte.lb (lower bound), and qte.ub (upper bound).
+#'        confidence interval, l.dte (lower bound), and u.dte (upper bound).
 #'@export
 #'@importFrom stats glm quantile approxfun
 #'@importFrom parallel makeCluster stopCluster clusterExport
 #'@importFrom boot boot.ci boot
 #'@importFrom Rearrangement rearrangement
 #-----------------------------------------------------------------------------
-kmqte <- function(out, delta, treat, probs = 0.5,
+kmdte <- function(out, delta, treat, ysup = NULL,
                   xpscore, b = 1000, ci = c(0.90,0.95,0.99),
                   standardize = TRUE, cores = 1) {
   #-----------------------------------------------------------------------------
   # first, we merge all the data into a single datafile
   fulldata <- data.frame(cbind(out, delta, treat, xpscore))
   #-----------------------------------------------------------------------------
+  # set up all unique uncensored points in the data (use it as ysup, if NULL)
+  yy <- sort(unique(fulldata[fulldata$delta == 1,]$out))
+  if (is.null(ysup) == TRUE){
+    ysup <- yy
+  }
+  #-----------------------------------------------------------------------------
   # Next, we set up the bootstrap function
-  boot1.kmqte <- function(fulldata, i, probs1 = probs,
+  boot1.kmdte <- function(fulldata, i, ysup1 = ysup,
                           standardize1 = standardize){
     #----------------------------------------------------------------------------
     # Select the data for the bootstrap (like the original data)
@@ -99,7 +105,7 @@ kmqte <- function(out, delta, treat, probs = 0.5,
       w0km.b <- w0km.b / mean((1 - df.b$treat) / (1 - df.b$pscore))
     }
     #-----------------------------------------------------------------------------
-    # Compute Counterfactual quantiles, and the QTE
+    # Compute Counterfactual distributions, and the DTE
     # First, we KM estimates of the potential outcomes distribution
     kmcdf.y1 <- w.ecdf(df.b$out, w1km.b)
     kmcdf.y0 <- w.ecdf(df.b$out, w0km.b)
@@ -109,23 +115,23 @@ kmqte <- function(out, delta, treat, probs = 0.5,
     #                                           kmcdf.y1(df.b$out))
     #kmcdf.y1.r[kmcdf.y1.r > 1] <- 1
     #kmcdf.y1.r[kmcdf.y1.r < 0] <- 0
-    #kmcdf.y1.r <- r.ecdf(df.b$out, kmcdf.y1.r)
+    #kmcdf.y1.r <- r.ecdf(ysup1, kmcdf.y1.r)
 
     #kmcdf.y0.r <- Rearrangement::rearrangement(data.frame(df.b$out),
     #                                           kmcdf.y0(df.b$out))
     #kmcdf.y0.r[kmcdf.y0.r > 1] <- 1
     #kmcdf.y0.r[kmcdf.y0.r<0] <- 0
-    #kmcdf.y0.r <- r.ecdf(df.b$out, kmcdf.y0.r)
+    #kmcdf.y0.r <- r.ecdf(ysup1, kmcdf.y0.r)
 
-    #quantiles of y1 and y0, and qte
-    #qy1 <- stats::quantile(kmcdf.y1.r, type = 1, probs = probs1)
-    #qy0 <- stats::quantile(kmcdf.y0.r, type = 1, probs = probs1)
-    qy1 <- stats::quantile(kmcdf.y1, type = 1, probs = probs1)
-    qy0 <- stats::quantile(kmcdf.y0, type = 1, probs = probs1)
+    #Distribution of y1 and y0, and dte
+    #cdfy1 <- kmcdf.y1.r(ysup1)
+    #cdfy0 <- kmcdf.y0.r(ysup1)
+    cdfy1 <- kmcdf.y1(ysup1)
+    cdfy0 <- kmcdf.y0(ysup1)
 
-    qte <- qy1 - qy0
+    dte <- cdfy1 - cdfy0
     #-----------------------------------------------------------------------------
-    return(cbind(qy1, qy0, qte))
+    return(cbind(cdfy1, cdfy0, dte))
   }
   #-----------------------------------------------------------------------------
   # Number of bootstrap draws
@@ -133,78 +139,78 @@ kmqte <- function(out, delta, treat, probs = 0.5,
   #----------------------------------------------------------------------------
   #COmput the bootstrap
   if (cores == 1){
-    boot.kmqte <- boot::boot(fulldata, boot1.kmqte, R = nboot,
+    boot.kmdte <- boot::boot(fulldata, boot1.kmdte, R = nboot,
                              stype = "i", sim = "ordinary")
   }
   if (cores > 1){
     cl <- parallel::makeCluster(cores)
     #clusterExport(cl, "kmweight")
     parallel::clusterSetRNGStream(cl)
-    boot.kmqte <- boot::boot(fulldata, boot1.kmqte, R = nboot, parallel = "snow",
+    boot.kmdte <- boot::boot(fulldata, boot1.kmdte, R = nboot, parallel = "snow",
                              ncpus = cores, stype = "i", sim = "ordinary")
     parallel::stopCluster(cl)
   }
   #----------------------------------------------------------------------------
-  # Compute Counterfactual quantiles and the QTE
-  qy1 <- matrix(boot.kmqte$t0[,1],1,length(probs))
-  rownames(qy1) <- "Quantile Y(1)"
-  colnames(qy1) <- names(quantile(1, probs = probs))
+  # Compute Counterfactual distributions and the DTE
+  cdfy1 <- matrix(boot.kmdte$t0[,1],1,length(ysup))
+  rownames(cdfy1) <- "Distribution Y(1)"
+  colnames(cdfy1) <- ysup
 
-  qy0 <- matrix(boot.kmqte$t0[,2],1,length(probs))
-  rownames(qy0) <- "Quantile Y(0)"
-  colnames(qy0) <- names(quantile(1, probs = probs))
+  cdfy0 <- matrix(boot.kmdte$t0[,2],1,length(ysup))
+  rownames(cdfy0) <- "Distribution Y(0)"
+  colnames(cdfy0) <- ysup
 
-  qte <- matrix(boot.kmqte$t0[,3],1,length(probs))
-  rownames(qte) <- "QTE"
-  colnames(qte) <- names(quantile(1, probs = probs))
+  dte <- matrix(boot.kmdte$t0[,3],1,length(ysup))
+  rownames(dte) <- "DTE"
+  colnames(dte) <- ysup
   #----------------------------------------------------------------------------
-  #Compute the confidence interval for qte
-  n.probs <- length(probs)
+  #Compute the confidence interval for dte
+  n.ysup <- length(ysup)
   n.ci <- length(ci)
 
-  if (n.ci == 1 & n.probs == 1){
-    qte.lb <- boot::boot.ci(boot.kmqte, type="perc", index = 3, conf = ci)$percent[4]
-    qte.ub <- boot::boot.ci(boot.kmqte, type="perc", index = 3, conf = ci)$percent[5]
+  if (n.ci == 1 & n.ysup == 1){
+    dte.lb <- boot::boot.ci(boot.kmdte, type="perc", index = 3, conf = ci)$percent[4]
+    dte.ub <- boot::boot.ci(boot.kmdte, type="perc", index = 3, conf = ci)$percent[5]
   }
 
-  if (n.ci >1 & n.probs == 1){
-    qte.lb <- boot::boot.ci(boot.kmqte, type="perc", index = 3, conf = ci)$percent[,4]
-    qte.ub <- boot::boot.ci(boot.kmqte, type="perc", index = 3, conf = ci)$percent[,5]
+  if (n.ci >1 & n.ysup == 1){
+    dte.lb <- boot::boot.ci(boot.kmdte, type="perc", index = 3, conf = ci)$percent[,4]
+    dte.ub <- boot::boot.ci(boot.kmdte, type="perc", index = 3, conf = ci)$percent[,5]
   }
 
-  if ((n.ci == 1) * (n.probs > 1) == 1){
-    qte.lb <- matrix(NA, n.ci, n.probs)
-    qte.ub <- matrix(NA, n.ci, n.probs)
-    for (i in 1:n.probs){
-      qte.lb[,i] <- boot::boot.ci(boot.kmqte, type="perc",
-                          index = (i+ 2* n.probs), conf = ci)$percent[4]
-      qte.ub[,i] <- boot::boot.ci(boot.kmqte, type="perc",
-                          index = (i+ 2* n.probs), conf = ci)$percent[5]
+  if ((n.ci == 1) * (n.ysup > 1) == 1){
+    dte.lb <- matrix(NA, n.ci, n.ysup)
+    dte.ub <- matrix(NA, n.ci, n.ysup)
+    for (i in 1:n.ysup){
+      dte.lb[,i] <- boot::boot.ci(boot.kmdte, type="perc",
+                                  index = (i+ 2* n.ysup), conf = ci)$percent[4]
+      dte.ub[,i] <- boot::boot.ci(boot.kmdte, type="perc",
+                                  index = (i+ 2* n.ysup), conf = ci)$percent[5]
     }
   }
 
-  if ((n.ci > 1) * (n.probs > 1) == 1){
-    qte.lb <- matrix(NA, n.ci, n.probs)
-    qte.ub <- matrix(NA, n.ci, n.probs)
-    for (i in 1:n.probs){
-      qte.lb[,i] <- boot::boot.ci(boot.kmqte, type="perc",
-                                 index = (i+ 2* n.probs), conf = ci)$percent[,4]
-      qte.ub[,i] <- boot::boot.ci(boot.kmqte, type="perc",
-                                 index = (i+ 2* n.probs), conf = ci)$percent[,5]
+  if ((n.ci > 1) * (n.ysup > 1) == 1){
+    dte.lb <- matrix(NA, n.ci, n.ysup)
+    dte.ub <- matrix(NA, n.ci, n.ysup)
+    for (i in 1:n.ysup){
+      dte.lb[,i] <- boot::boot.ci(boot.kmdte, type="perc",
+                                  index = (i+ 2* n.ysup), conf = ci)$percent[,4]
+      dte.ub[,i] <- boot::boot.ci(boot.kmdte, type="perc",
+                                  index = (i+ 2* n.ysup), conf = ci)$percent[,5]
     }
   }
   #----------------------------------------------------------------------------
-  colnames(qte.lb) <- paste(names(quantile(1, probs = probs)), "quantile")
-  colnames(qte.ub) <- paste(names(quantile(1, probs = probs)), "quantile")
-  rownames(qte.ub) <- paste(names(quantile(1, probs = ci)), 'CI: UB')
-  rownames(qte.lb) <- paste(names(quantile(1, probs = ci)), 'CI: LB')
+  colnames(dte.lb) <- ysup
+  colnames(dte.ub) <- ysup
+  rownames(dte.ub) <- paste(names(quantile(1, probs = ci)), 'CI: UB')
+  rownames(dte.lb) <- paste(names(quantile(1, probs = ci)), 'CI: LB')
   #----------------------------------------------------------------------------
   # Return these
-  list(qte = qte,
-       qy1 = qy1,
-       qy0 = qy0,
-       #boot = boot.kmqte,
-       qte.lb = qte.lb,
-       qte.ub = qte.ub
+  list(dte = dte,
+       cdfy1 = cdfy1,
+       cdfy = cdfy0,
+       #boot = boot.kmdte,
+       dte.lb = dte.lb,
+       dte.ub = dte.ub
   )
 }

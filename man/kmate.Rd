@@ -5,7 +5,7 @@
 \title{kmate: Two-Step Kaplan-Meier Average Treatment Effect}
 \usage{
 kmate(out, delta, treat, xpscore, b = 1000, ci = c(0.9, 0.95, 0.99),
-  tau = NA, standardize = TRUE, cores = 1)
+  trunc = NULL, standardize = TRUE, cores = 1)
 }
 \arguments{
 \item{out}{vector containing the outcome of interest}
@@ -24,9 +24,9 @@ Propensity score estimation is based on Logit.}
 of the required interval(s). Default is a vector with
 0,90, 0.95 and 0.99}
 
-\item{tau}{scalar that defined the truncation parameter. Default is NA, which does not perform any kind of
-truncation in the computation of the ATE. When tau is different than NA, all outcomes which values greater
-than tau are truncated.}
+\item{trunc}{scalar that defined the truncation parameter. Default is NULL, which does not perform any kind of
+truncation in the computation of the ATE. When trunc is different than NULL, all outcomes which values greater
+than trunc are truncated.}
 
 \item{standardize}{Default is TRUE, which normalizes propensity score weights to sum to 1 within each treatment group.
 Set to FALSE to return Horvitz-Thompson weights.}
@@ -36,8 +36,8 @@ If cores>1, the bootstrap is conducted using snow}
 }
 \value{
 a list containing the Average treatment effect estimate, ate,
-       its associated bootstrapped values, b.ate, and the \emph{ci} confidence
-       confidence interval, l.ate (lower bound), and u.ate (upper bound).
+       and the bootstrapped \emph{ci} confidence
+       confidence interval, ate.lb (lower bound), and ate.ub (upper bound).
 }
 \description{
 \emph{kmate} computes the Average Treatment Effect for possibly right-censored outcomes.

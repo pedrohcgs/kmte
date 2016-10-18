@@ -3,6 +3,7 @@
 export(hcate)
 export(hclate)
 export(kmate)
+export(kmdte)
 export(kmqte)
 export(zcate)
 export(zcdte)

@@ -16,8 +16,8 @@
 #'@param ci A scalar or vector with values in (0,1) containing the confidence level(s)
 #'          of the required interval(s). Default is a vector with
 #'          0,90, 0.95 and 0.99
-#'@param trunc scalar that defined the truncation parameter. Default is NA, which does not perform any kind of
-#'            truncation in the computation of the ATE. When trunc is different than NA, all outcomes which values greater
+#'@param trunc scalar that defined the truncation parameter. Default is NULL, which does not perform any kind of
+#'            truncation in the computation of the ATE. When trunc is different than NULL, all outcomes which values greater
 #'            than trunc are truncated.
 #'@param standardize Default is TRUE, which normalizes propensity score weights to sum to 1 within each treatment group.
 #'                    Set to FALSE to return Horvitz-Thompson weights.
@@ -25,15 +25,15 @@
 #'        If cores>1, the bootstrap is conducted using snow
 #'
 #'@return a list containing the Average treatment effect estimate, ate,
-#'        its associated bootstrapped values, b.ate, and the \emph{ci} confidence
-#'        confidence interval, l.ate (lower bound), and u.ate (upper bound).
+#'        and the bootstrapped \emph{ci} confidence
+#'        confidence interval, ate.lb (lower bound), and ate.ub (upper bound).
 #'@export
 #'@importFrom stats glm
 #'@importFrom parallel makeCluster stopCluster clusterExport
 #'@importFrom boot boot.ci boot
 #-----------------------------------------------------------------------------
 kmate <- function(out, delta, treat, xpscore, b = 1000, ci = c(0.90,0.95,0.99),
-                  trunc = NA, standardize = TRUE, cores = 1) {
+                  trunc = NULL, standardize = TRUE, cores = 1) {
   #-----------------------------------------------------------------------------
   # first, we merge all the data into a single datafile
   fulldata <- data.frame(cbind(out, delta, treat, xpscore))
@@ -93,7 +93,7 @@ kmate <- function(out, delta, treat, xpscore, b = 1000, ci = c(0.90,0.95,0.99),
     meany1km <- sum(w1km.b * df.b$out)
     meany0km <- sum(w0km.b * df.b$out)
 
-    if (is.na(trunc1) == FALSE){
+    if (is.null(trunc1) == FALSE){
       meany1km <- sum(w1km.b * df.b$out * (df.b$out <= trunc1))
       meany0km <- sum(w0km.b * df.b$out * (df.b$out <= trunc1))
     }
