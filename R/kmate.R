@@ -36,7 +36,7 @@ kmate <- function(out, delta, treat, xpscore, b = 1000, ci = 0.95, tau = NA, sta
   fulldata <- data.frame(cbind(out, delta, treat, xpscore))
   #-----------------------------------------------------------------------------
   # Next, we set up the bootstrap function
-  boot1.kmate <- function(fulldata, i){
+  boot1.kmate <- function(fulldata, i, tau1 = tau, standardize1 = standardize){
     #----------------------------------------------------------------------------
     # Select the data for the bootstrap (like the original data)
     df.b=fulldata[i,]
@@ -47,7 +47,7 @@ kmate <- function(out, delta, treat, xpscore, b = 1000, ci = 0.95, tau = NA, sta
     dim.b <- dim(df.b)[2]
     # Next, we rename the variable in xpscore to avoid problems
     xpscore1.b <- df.b[, (4:(dim.b - 1))]
-    datascore.b <- df.b(y = df.b[, 3], xpscore1.b)
+    datascore.b <- data.frame(y = df.b[, 3], xpscore1.b)
     #-----------------------------------------------------------------------------
     # estimate the propensity score
     pscore.b <- stats::glm(y ~ ., data = datascore.b,
