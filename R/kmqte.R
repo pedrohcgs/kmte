@@ -152,24 +152,21 @@ kmqte <- function(out, delta, treat, probs = 0.5,
  # names(qte) <- paste(probs, "-quantile treatment effect", sep="")
   #----------------------------------------------------------------------------
   #Compute the confidence interval for qte
-  if (length(ci) == 1){
+  if (length(ci) == 1 & length(probs) == 1){
     qte.lb <- boot.ci(boot.kmqte, type="perc", index=3, conf = ci)$percent[4]
     qte.ub <- boot.ci(boot.kmqte, type="perc", index=3, conf = ci)$percent[5]
-    names(qte.lb) <- paste(ci*100,"% Confidence Interval: Lower Bound", sep="")
-    names(qte.ub) <- paste(ci*100,"% Confidence Interval: Upper Bound", sep="")
   }
-  if (length(ci) >1){
+  if (length(ci) >1 & length(probs) == 1){
     qte.lb <- boot.ci(boot.kmqte, type="perc", index=3, conf = ci)$percent[,4]
     qte.ub <- boot.ci(boot.kmqte, type="perc", index=3, conf = ci)$percent[,5]
-    names(qte.lb) <- paste(ci*100,"% Confidence Interval: Lower Bound", sep="")
-    names(qte.ub) <- paste(ci*100,"% Confidence Interval: Upper Bound", sep="")
   }
   #----------------------------------------------------------------------------
   # Return these
   list(qte = qte,
        qy1 = qy1,
        qy0 = qy0,
-       #boot = boot.kmqte,
-       qte.lb = qte.lb,
-       qte.ub = qte.ub)
+       boot = boot.kmqte
+       #qte.lb = qte.lb,
+       #qte.ub = qte.ub
+  )
 }
