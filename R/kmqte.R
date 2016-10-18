@@ -121,11 +121,10 @@ kmqte <- function(out, delta, treat, probs = 0.5,
     qy1=quantile(kmcdf.y1.r, type = 1, probs = probs1)
     qy0=quantile(kmcdf.y0.r, type = 1, probs = probs1)
 
+
     qte <- qy1 - qy0
     #-----------------------------------------------------------------------------
-    ret <- as.data.frame(cbind(qy1, qy0, qte))
-    colnames(ret) <- c("Quantile Y(1)", "Quantile Y(0)", "QTE")
-    return(ret)
+    return(cbind(qy1, qy0, qte))
   }
   #-----------------------------------------------------------------------------
   # Number of bootstrap draws
@@ -145,11 +144,11 @@ kmqte <- function(out, delta, treat, probs = 0.5,
   }
   #----------------------------------------------------------------------------
   # Compute Counterfactual quantiles and the QTE
-  qy1 <- boot.ci(boot.kmqte, type="perc", index=1)$t0
+  qy1 <- boot.kmqte$t0[,1]
   #names(qy1) <- paste("Counterfactual ", probs, "-quantile for treated", sep="")
-  qy0 <- boot.ci(boot.kmqte, type="perc", index=2)$t0
+  qy0 <- boot.kmqte$t0[,2]
   #names(qy0) <- paste("Counterfactual", probs, "quantile for control", sep="")
-  qte <- boot.ci(boot.kmqte, type="perc", index=3)$t0
+  qte <- boot.kmqte$t0[,3]
  # names(qte) <- paste(probs, "-quantile treatment effect", sep="")
   #----------------------------------------------------------------------------
   #Compute the confidence interval for qte
