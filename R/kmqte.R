@@ -183,8 +183,8 @@ kmqte <- function(out, delta, treat, probs = 0.5,
   list(qte = qte,
        qy1 = qy1,
        qy0 = qy0,
-       #boot = boot.kmqte
-       qte.lb = qte.lb,
-       qte.ub = qte.ub
+       boot = boot.kmqte
+       #qte.lb = qte.lb,
+       #qte.ub = qte.ub
   )
 }
