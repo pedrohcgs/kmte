@@ -115,7 +115,7 @@ kmate <- function(out, delta, treat, xpscore, b = 1000, ci = 0.95, tau = NA, sta
   }
   if (cores > 1){
     cl <- parallel::makeCluster(cores)
-    clusterExport(cl, "kmweight")
+    #clusterExport(cl, "kmweight")
     parallel::clusterSetRNGStream(cl)
     boot.kmate <- boot::boot(fulldata, boot1.kmate, R = nboot, parallel = "snow", ncpus = cores)
     parallel::stopCluster(cl)
