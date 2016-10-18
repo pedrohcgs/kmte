@@ -148,10 +148,15 @@ kmqte <- function(out, delta, treat, probs = 0.5,
   # Compute Counterfactual quantiles and the QTE
   qy1 <- matrix(boot.kmqte$t0[,1],1,length(probs))
   rownames(qy1) <- "Quantile Y(1)"
+  colnames(qy1) <- names(quantile(1, probs = probs))
+
   qy0 <- matrix(boot.kmqte$t0[,2],1,length(probs))
   rownames(qy0) <- "Quantile Y(0)"
+  colnames(qy0) <- names(quantile(1, probs = probs))
+
   qte <- matrix(boot.kmqte$t0[,3],1,length(probs))
   rownames(qte) <- "QTE"
+  colnames(qte) <- names(quantile(1, probs = probs))
   #----------------------------------------------------------------------------
   #Compute the confidence interval for qte
   n.probs <- length(probs)
