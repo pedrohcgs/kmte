@@ -39,7 +39,7 @@ kmate <- function(out, delta, treat, xpscore, b = 1000, ci = 0.95, tau = NA, sta
   boot1.kmate <- function(fulldata, i, tau1 = tau, standardize1 = standardize){
     #----------------------------------------------------------------------------
     # # of variables in DF
-    dim.b=dim(df)[2]
+    dim.b=dim(fulldata)[2]
     # Select the data for the bootstrap (like the original data)
     df.b=df[i,1:dim.b]
     #----------------------------------------------------------------------------
