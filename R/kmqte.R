@@ -166,7 +166,7 @@ kmqte <- function(out, delta, treat, probs = 0.5,
     qte.ub <- boot::boot.ci(boot.kmqte, type="perc", index = 3, conf = ci)$percent[,5]
   }
 
-  if (n.ci == 1 & n.probs > 1){
+  if ((n.ci == 1) * (n.probs > 1) ==1){
     qte.lb <- rep(NA, n.probs)
     qte.ub <- rep(NA, n.probs)
 
@@ -184,7 +184,7 @@ kmqte <- function(out, delta, treat, probs = 0.5,
        qy1 = qy1,
        qy0 = qy0,
        boot = boot.kmqte
-       #qte.lb = qte.lb,
-       #qte.ub = qte.ub
+       qte.lb = qte.lb,
+       qte.ub = qte.ub
   )
 }
