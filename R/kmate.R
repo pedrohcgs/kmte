@@ -13,7 +13,8 @@
 #'               transformations) to be included in the propensity score estimation.
 #'               Propensity score estimation is based on Logit.
 #'@param b 	The number of bootstrap replicates to be performed. Default is 1,000.
-#'@param ci A scalar or vector containing the confidence level(s) of the required interval(s). Default is 0.95.
+#'@param ci A scalar or vector containing the confidence level(s) of the required interval(s). Default is a vector with
+#'          0,90, 0.95 and 0.99
 #'@param tau scalar that defined the truncation parameter. Default is NA, which does not perform any kind of
 #'            truncation in the computation of the ATE. When tau is different than NA, all outcomes which values greater
 #'            than tau are truncated.
@@ -30,7 +31,7 @@
 #'@importFrom parallel makeCluster stopCluster clusterExport
 #'@importFrom boot boot.ci boot
 #-----------------------------------------------------------------------------
-kmate <- function(out, delta, treat, xpscore, b = 1000, ci = 0.95, tau = NA, standardize = TRUE, cores = 1) {
+kmate <- function(out, delta, treat, xpscore, b = 1000, ci = c(0.90,0.95,0.99), tau = NA, standardize = TRUE, cores = 1) {
   #-----------------------------------------------------------------------------
   # first, we merge all the data into a single datafile
   fulldata <- data.frame(cbind(out, delta, treat, xpscore))
@@ -135,7 +136,7 @@ kmate <- function(out, delta, treat, xpscore, b = 1000, ci = 0.95, tau = NA, sta
   list(ate = ate,
        meany1 = meany1km,
        meany0 = meany0km,
-       boot = boot.kmate,
+       #boot = boot.kmate,
        ate.lb = ate.lb,
        ate.ub = ate.ub)
 }
