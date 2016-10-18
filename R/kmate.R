@@ -36,7 +36,7 @@ kmate <- function(out, delta, treat, xpscore, b = 1000, ci = 0.95, tau = NA, sta
   fulldata <- data.frame(cbind(out, delta, treat, xpscore))
   #-----------------------------------------------------------------------------
   # Next, we set up the bootstrap function
-  boot1.kmate <- function(df, i, tau1 = tau, standardize1 = standardize){
+  boot1.kmate <- function(fulldata, i, tau1 = tau, standardize1 = standardize){
     #----------------------------------------------------------------------------
     # # of variables in DF
     dim.b=dim(df)[2]
