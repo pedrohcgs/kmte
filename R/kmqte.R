@@ -150,7 +150,7 @@ kmqte <- function(out, delta, treat, probs = 0.5,
   rownames(qy1) <- "Quantile Y(1)"
   qy0 <- matrix(boot.kmqte$t0[,2],1,length(probs))
   rownames(qy0) <- "Quantile Y(0)"
-  qte <- matrix(boot.kmqte$t0[,3],length(probs))
+  qte <- matrix(boot.kmqte$t0[,3],1,length(probs))
   rownames(qte) <- "QTE"
   #----------------------------------------------------------------------------
   #Compute the confidence interval for qte
