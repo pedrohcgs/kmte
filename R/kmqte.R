@@ -149,11 +149,11 @@ kmqte <- function(out, delta, treat, probs = 0.5,
   #----------------------------------------------------------------------------
   # Compute Counterfactual quantiles and the QTE
   qy1 <- boot.ci(boot.kmqte, type="perc", index=1)$t0
-  names(qy1) <- paste("Counterfactual ", ci, "-quantile for treated", sep="")
+  names(qy1) <- paste("Counterfactual ", probs, "-quantile for treated", sep="")
   qy0 <- boot.ci(boot.kmqte, type="perc", index=2)$t0
-  names(qy0) <- paste("Counterfactual", ci, "quantile for control", sep="")
+  names(qy0) <- paste("Counterfactual", probs, "quantile for control", sep="")
   qte <- boot.ci(boot.kmqte, type="perc", index=3)$t0
-  names(qte) <- paste(ci, "-quantile treatment effect", sep="")
+  names(qte) <- paste(probs, "-quantile treatment effect", sep="")
   #----------------------------------------------------------------------------
   #Compute the confidence interval for qte
   if (length(ci) == 1){
