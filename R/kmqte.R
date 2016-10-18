@@ -132,14 +132,15 @@ kmqte <- function(out, delta, treat, probs = 0.5,
   #----------------------------------------------------------------------------
   #COmput the bootstrap
   if (cores == 1){
-    boot.kmqte <- boot::boot(fulldata, boot1.kmqte, R = nboot)
+    boot.kmqte <- boot::boot(fulldata, boot1.kmqte, R = nboot,
+                             stype = "i", sim = "ordinary")
   }
   if (cores > 1){
     cl <- parallel::makeCluster(cores)
     #clusterExport(cl, "kmweight")
     parallel::clusterSetRNGStream(cl)
     boot.kmqte <- boot::boot(fulldata, boot1.kmqte, R = nboot, parallel = "snow",
-                             ncpus = cores)
+                             ncpus = cores, stype = "i", sim = "ordinary")
     parallel::stopCluster(cl)
   }
   #----------------------------------------------------------------------------
@@ -156,22 +157,24 @@ kmqte <- function(out, delta, treat, probs = 0.5,
   n.ci <- length(ci)
 
   if (n.ci == 1 & n.probs == 1){
-    qte.lb <- boot.ci(boot.kmqte, type="perc", index = 3, conf = ci)$percent[4]
-    qte.ub <- boot.ci(boot.kmqte, type="perc", index = 3, conf = ci)$percent[5]
+    qte.lb <- boot::boot.ci(boot.kmqte, type="perc", index = 3, conf = ci)$percent[4]
+    qte.ub <- boot::boot.ci(boot.kmqte, type="perc", index = 3, conf = ci)$percent[5]
   }
+
   if (n.ci >1 & n.probs == 1){
-    qte.lb <- boot.ci(boot.kmqte, type="perc", index = 3, conf = ci)$percent[,4]
-    qte.ub <- boot.ci(boot.kmqte, type="perc", index = 3, conf = ci)$percent[,5]
+    qte.lb <- boot::boot.ci(boot.kmqte, type="perc", index = 3, conf = ci)$percent[,4]
+    qte.ub <- boot::boot.ci(boot.kmqte, type="perc", index = 3, conf = ci)$percent[,5]
   }
+
   if (n.ci == 1 & n.probs > 1){
     qte.lb <- rep(NA, n.probs)
     qte.ub <- rep(NA, n.probs)
 
     for (i in 1:n.probs){
-      qte.lb[i] < boot.ci(boot.kmqte, type="perc",
-                          index = i+ 2* n.probs , conf = ci)$percent[4]
-      qte.ub[i] < boot.ci(boot.kmqte, type="perc",
-                          index = i+ 2* n.probs , conf = ci)$percent[5]
+      qte.lb[i] < boot::boot.ci(boot.kmqte, type="perc",
+                          index = (i+ 2* n.probs), conf = ci)$percent[4]
+      qte.lb[i] < boot::boot.ci(boot.kmqte, type="perc",
+                          index = (i+ 2* n.probs), conf = ci)$percent[5]
     }
   }
 
