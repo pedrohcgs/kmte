@@ -38,10 +38,8 @@ kmate <- function(out, delta, treat, xpscore, b = 1000, ci = 0.95, tau = NA, sta
   # Next, we set up the bootstrap function
   boot1.kmate <- function(fulldata, i, tau1 = tau, standardize1 = standardize){
     #----------------------------------------------------------------------------
-    # of variables in fulldata
-    dim.b=dim(fulldata)[2]
     # Select the data for the bootstrap (like the original data)
-    df.b=fulldata[i,1:dim.b]
+    df.b=fulldata[i,]
     #----------------------------------------------------------------------------
     # Compute Kaplan-Meier Weigths - data is now sorted!
     df.b <- kmweight(1, 2, df.b)
