@@ -29,7 +29,7 @@
 #'        its associated bootstrapped values, b.ate, and the \emph{ci} confidence
 #'        confidence interval, l.ate (lower bound), and u.ate (upper bound).
 #'@export
-#'@importFrom stats glm
+#'@importFrom stats glm quantile approxfun
 #'@importFrom parallel makeCluster stopCluster clusterExport
 #'@importFrom boot boot.ci boot
 #'@importFrom Rearrangement rearrangement
@@ -117,10 +117,9 @@ kmqte <- function(out, delta, treat, probs = 0.5,
     kmcdf.y0.r[kmcdf.y0.r<0] <- 0
     kmcdf.y0.r <- r.ecdf(df.b$out, kmcdf.y0.r)
 
-    #quantiles of y1 and y0
-    qy1=quantile(kmcdf.y1.r, type = 1, probs = probs1)
-    qy0=quantile(kmcdf.y0.r, type = 1, probs = probs1)
-
+    #quantiles of y1 and y0, and qte
+    qy1 <- stats::quantile(kmcdf.y1.r, type = 1, probs = probs1)
+    qy0 <- stats::quantile(kmcdf.y0.r, type = 1, probs = probs1)
 
     qte <- qy1 - qy0
     #-----------------------------------------------------------------------------
