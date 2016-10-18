@@ -121,10 +121,11 @@ kmqte <- function(out, delta, treat, probs = 0.5,
     qy1=quantile(kmcdf.y1.r, type = 1, probs = probs1)
     qy0=quantile(kmcdf.y0.r, type = 1, probs = probs1)
 
-
     qte <- qy1 - qy0
     #-----------------------------------------------------------------------------
-    return(rbind(qy1, qy0, qte))
+    ret <- as.data.frame(cbind(qy1, qy0, qte))
+    colnames(ret) <- c("Quantile Y(1)", "Quantile Y(0)", "QTE")
+    return(ret)
   }
   #-----------------------------------------------------------------------------
   # Number of bootstrap draws
