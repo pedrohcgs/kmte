@@ -18,7 +18,8 @@ Imports:
     MASS (>= 7.0),
     stats,
     parallel,
-    harvestr
+    harvestr,
+    boot
 License: GPL-2
 LazyData: TRUE
 RoxygenNote: 5.0.1
