@@ -121,11 +121,11 @@ kmate <- function(out, delta, treat, xpscore, b = 1000, ci = c(0.90,0.95,0.99),
   #----------------------------------------------------------------------------
   # Compute Counterfactual Average Outcomes, E[Y(1)] and E[Y(0)], and the ATE
   meany1km <- boot.ci(boot.kmate, type="perc", index=1)$t0
-  names(meany1km) <- "Counterfactual E[Y(1)]"
+  names(meany1km) <- "E[Y(1)]"
   meany0km <- boot.ci(boot.kmate, type="perc", index=2)$t0
-  names(meany0km) <- "Counterfactual E[Y(0)]"
+  names(meany0km) <- "E[Y(0)]"
   ate <- boot.ci(boot.kmate, type="perc", index=3)$t0
-  names(ate) <- "Average Treatment Effect"
+  names(ate) <- "ATE"
   #----------------------------------------------------------------------------
   #Compute the confidence interval for ate
   if (length(ci) == 1){
@@ -141,6 +141,8 @@ kmate <- function(out, delta, treat, xpscore, b = 1000, ci = c(0.90,0.95,0.99),
   ate.ub <- matrix(ate.ub,length(ci),1)
   rownames(ate.ub) <- paste(names(quantile(1, probs = ci)), 'CI: UB')
   rownames(ate.lb) <- paste(names(quantile(1, probs = ci)), 'CI: LB')
+  colnames(ate.ub) <- "ATE"
+  colnames(ate.lb) <- "ATE"
   #----------------------------------------------------------------------------
   # Return these
   list(ate = ate,
