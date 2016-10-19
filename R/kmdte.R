@@ -208,7 +208,7 @@ kmdte <- function(out, delta, treat, ysup = NULL,
   # Return these
   list(dte = dte,
        cdfy1 = cdfy1,
-       cdfy = cdfy0,
+       cdfy0 = cdfy0,
        #boot = boot.kmdte,
        dte.lb = dte.lb,
        dte.ub = dte.ub
