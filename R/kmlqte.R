@@ -95,6 +95,8 @@ kmlqte <- function(out, delta, treat, z, xpscore, probs = 0.5, b = 1000,
     # Let's put everything in a single data
     df.b <- data.frame(rbind(data.treat.z1.b, data.treat.z0.b,
                              data.control.z1.b, data.control.z0.b))
+    # sort wrt out and if draw, by delta
+    df.b <- df.b[order(df.b$out, df.b$delta),]
     #-----------------------------------------------------------------------------
     # Compute weigths for treatment and control groups
     w11km.b <- ((df.b$treat * df.b$z * df.b$w) / df.b$pscore)
