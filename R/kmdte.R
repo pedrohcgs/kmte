@@ -153,11 +153,11 @@ kmdte <- function(out, delta, treat, ysup = NULL,
   #----------------------------------------------------------------------------
   # Compute Counterfactual distributions and the DTE
   cdfy1 <- matrix(boot.kmdte$t0[,1],1,length(ysup))
-  rownames(cdfy1) <- "Distribution Y(1)"
+  rownames(cdfy1) <- "CDF Y(1)"
   colnames(cdfy1) <- ysup
 
   cdfy0 <- matrix(boot.kmdte$t0[,2],1,length(ysup))
-  rownames(cdfy0) <- "Distribution Y(0)"
+  rownames(cdfy0) <- "CDF Y(0)"
   colnames(cdfy0) <- ysup
 
   dte <- matrix(boot.kmdte$t0[,3],1,length(ysup))
