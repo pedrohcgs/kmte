@@ -1,4 +1,4 @@
-#' kmlate: Kaplan-Meier Local Average Treatment Effect
+#' Kaplan-Meier Local Average Treatment Effect
 #'
 #' \emph{kmlate} computes the Local Average Treatment Effect for possibly right-censored outcomes.
 #' The estimator relies on the availability of an Instrumental variable Z, and on a monotonicity assumption.

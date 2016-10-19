@@ -2,7 +2,7 @@
 % Please edit documentation in R/kmate.R
 \name{kmate}
 \alias{kmate}
-\title{kmate: Kaplan-Meier Average Treatment Effect}
+\title{Kaplan-Meier Average Treatment Effect}
 \usage{
 kmate(out, delta, treat, xpscore, b = 1000, ci = c(0.9, 0.95, 0.99),
   trunc = NULL, standardize = TRUE, cores = 1)

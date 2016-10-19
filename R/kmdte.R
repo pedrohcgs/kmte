@@ -1,4 +1,4 @@
-#' kmdte: Kaplan-Meier Distributional Treatment Effect
+#' Kaplan-Meier Distributional Treatment Effect
 #'
 #' \emph{kmdte} computes the Distributional Treatment Effect for possibly right-censored
 #' outcomes. The estimator relies on the unconfoundedness assumption, and on

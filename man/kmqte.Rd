@@ -2,7 +2,7 @@
 % Please edit documentation in R/kmqte.R
 \name{kmqte}
 \alias{kmqte}
-\title{kmqte: Kaplan-Meier Quantile Treatment Effect}
+\title{Kaplan-Meier Quantile Treatment Effect}
 \usage{
 kmqte(out, delta, treat, probs = 0.5, xpscore, b = 1000, ci = c(0.9, 0.95,
   0.99), standardize = TRUE, cores = 1)

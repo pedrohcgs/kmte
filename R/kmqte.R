@@ -1,4 +1,4 @@
-#' kmqte: Kaplan-Meier Quantile Treatment Effect
+#' Kaplan-Meier Quantile Treatment Effect
 #'
 #' \emph{kmqte} computes the Quantile Treatment Effect for possibly right-censored
 #' outcomes. The estimator relies on the unconfoundedness assumption, and on
