@@ -120,16 +120,15 @@ kmldte <- function(out, delta, treat, z, xpscore, ysup = NULL, b = 1000,
 
 
     if (standardize1 == TRUE) {
-      w11km.b <- w11km.b / mean(((df.b$treat * df.b$z) / df.b$pscore))
-      w10km.b <- w10km.b / mean(((df.b$treat * (1 - df.b$z)) / (1 - df.b$pscore)))
-      w01km.b <- w01km.b / mean(((1 - df.b$treat) * df.b$z / df.b$pscore))
-      w00km.b <- w00km.b / mean(((1 - df.b$treat) * (1 - df.b$z) * df.b$w / (1 - df.b$pscore)))
+      w11km.b <- w11km.b / mean(((df.b$z) / df.b$pscore))
+      w10km.b <- w10km.b / mean((((1 - df.b$z)) / (1 - df.b$pscore)))
+      w01km.b <- w01km.b / mean((f.b$z / df.b$pscore))
+      w00km.b <- w00km.b / mean(((1 - df.b$z) * df.b$w / (1 - df.b$pscore)))
       kappa11 <- kappa11 / mean(df.b$z / df.b$pscore)
       kappa10 <- kappa10 / mean((1-df.b$z) / (1 - df.b$pscore))
       kappa01 <- kappa01 / mean(df.b$z / df.b$pscore)
       kappa00 <- kappa00 / mean((1-df.b$z) / (1 - df.b$pscore))
     }
-
     w1km.b <- w11km.b - w10km.b
     w0km.b <- w01km.b - w00km.b
     kappa1 <- kappa11 - kappa10
