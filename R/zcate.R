@@ -1,5 +1,5 @@
 
-#' zcate: Testing for Zero Conditional Average Treatment Effects
+#' Tests for Zero Conditional Average Treatment Effects
 #'
 #' \emph{zcate} computes Kolmogorov-Smirnov and Cramer-von Mises type tests
 #' for the null hypothesis of zero conditional average treatment effects.

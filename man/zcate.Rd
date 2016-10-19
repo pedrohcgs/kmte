@@ -2,7 +2,7 @@
 % Please edit documentation in R/zcate.R
 \name{zcate}
 \alias{zcate}
-\title{zcate: Testing for Zero Conditional Average Treatment Effects}
+\title{Tests for Zero Conditional Average Treatment Effects}
 \usage{
 zcate(out, delta, treat, xvector, xpscore, b, cores = 1)
 }

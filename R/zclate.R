@@ -1,5 +1,5 @@
 
-#' zclate: Testing for Zero Conditional Local Average Treatment Effects
+#' Tests for Zero Conditional Local Average Treatment Effects
 #'
 #' \emph{hclate} computes Kolmogorov-Smirnov and Cramer-von Mises type tests
 #' for the null hypothesis of zero conditional local average treatment effects.

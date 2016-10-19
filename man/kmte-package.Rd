@@ -4,7 +4,7 @@
 \name{kmte-package}
 \alias{kmte}
 \alias{kmte-package}
-\title{kmte: An R Package for Treatment Effects with Censored Outcomes.}
+\title{An R Package for Treatment Effects with Censored Outcomes.}
 \description{
 An R package for implementing all the tests proposed in Sant'Anna (2016b),
 "Nonparametric Tests for Treatment Effect Heterogeneity with Censored data",

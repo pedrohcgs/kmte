@@ -2,7 +2,7 @@
 % Please edit documentation in R/hclate.R
 \name{hclate}
 \alias{hclate}
-\title{hclate: Testing for Homogeneous Conditional Local Average Treatment Effects}
+\title{Tests for Homogeneous Conditional Local Average Treatment Effects}
 \usage{
 hclate(out, delta, treat, inst, xvector, xpscore, b, cores = 1)
 }

@@ -1,4 +1,4 @@
-#' hcate: Testing for Homogeneous Conditional Average Treatment Effects
+#' Tests for Homogeneous Conditional Average Treatment Effects
 #'
 #' \emph{hcate} computes Kolmogorov-Smirnov and Cramer-von Mises type tests
 #' for the null hypothesis of homogeneous conditional average treatment effects.

@@ -2,7 +2,7 @@
 % Please edit documentation in R/zclate.R
 \name{zclate}
 \alias{zclate}
-\title{zclate: Testing for Zero Conditional Local Average Treatment Effects}
+\title{Tests for Zero Conditional Local Average Treatment Effects}
 \usage{
 zclate(out, delta, treat, inst, xvector, xpscore, b, cores = 1)
 }

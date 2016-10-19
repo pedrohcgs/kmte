@@ -1,5 +1,5 @@
 
-#' zcldte: Testing for Zero Conditional Local Distribution Treatment Effects
+#' Tests for Zero Conditional Local Distribution Treatment Effects
 #'
 #' \emph{zcldte} computes Kolmogorov-Smirnov and Cramer-von Mises type tests
 #' for the null hypothesis of zero conditional local distribution treatment effects.
