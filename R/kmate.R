@@ -55,11 +55,6 @@ kmate <- function(out, delta, treat, xpscore, b = 1000, ci = c(0.90,0.95,0.99),
                            family = binomial("logit"))
     df.b$pscore <- pscore.b$fit
     #-----------------------------------------------------------------------------
-    # Create id to help on ordering
-    df.b$id <- 1:length(df.b[, 1])
-    # Update Dimension of data matrix fulldata
-    dim.all <- dim(df.b)[2]
-    #-----------------------------------------------------------------------------
     # sample size
     n.total.b <- as.numeric(length(df.b[, 1]))
     # subset of treated individuals
