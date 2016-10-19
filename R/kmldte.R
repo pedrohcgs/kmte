@@ -1,6 +1,6 @@
-#' Kaplan-Meier Local Quantile Treatment Effect
+#' Kaplan-Meier Local Distributional Treatment Effect
 #'
-#' \emph{kmlqte} computes the Local Quantile Treatment Effect for possibly right-censored outcomes.
+#' \emph{kmldte} computes the Local Distributional Treatment Effect for possibly right-censored outcomes.
 #' The estimator relies on the availability of an Instrumental variable Z, and on a monotonicity assumption.
 #' To implement the estimator, we make use of an instrumental propensity score approach.
 #' For details of the estimation procedure, see Sant'Anna (2016a), 'Program Evaluation with
@@ -14,9 +14,9 @@
 #'@param xpscore matrix (or data frame) containing the covariates (and their
 #'               transformations) to be included in the instrument propensity score estimation.
 #'               Instrument Propensity score estimation is based on Logit.
-#'@param probs   scalar or vector of probabilities with values in (0,1) for which
-#'               the quantile treatment effect is computed. Default is 0.5, returning
-#'               the median.
+#'@param ysup   scalar or vector of points for which
+#'               the distributional treatment effect is computed. If NULL,
+#'               all uncensored data points available are used.
 #'@param b 	The number of bootstrap replicates to be performed. Default is 1,000.
 #'@param ci A scalar or vector with values in (0,1) containing the confidence level(s)
 #'          of the required interval(s). Default is a vector with
@@ -31,24 +31,30 @@
 #'              rearrangement procedure proposed by Chernozhukov, Fernandez-Val, and Galichon (2010),
 #'              implemented in R through package Rearrangement. If FALSE, no adjustment is made.
 #'
-#'@return a list containing the local quantile treatment effect estimate, lqte,
+#'@return a list containing the local distributional treatment effect estimate, ldte,
 #'        and the bootstrapped \emph{ci} confidence
-#'        confidence interval, lqte.lb (lower bound), and lqte.ub (upper bound).
+#'        confidence interval, ldte.lb (lower bound), and ldte.ub (upper bound).
 #'@export
 #'@importFrom stats glm quantile approxfun
 #'@importFrom parallel makeCluster stopCluster clusterExport
 #'@importFrom boot boot.ci boot
 #'@importFrom Rearrangement rearrangement
 #-----------------------------------------------------------------------------
-kmlqte <- function(out, delta, treat, z, xpscore, probs = 0.5, b = 1000,
+kmldte <- function(out, delta, treat, z, xpscore, ysup = NULL, b = 1000,
                    ci = c(0.90,0.95,0.99),
                    standardize = TRUE, cores = 1, monot = TRUE) {
   #-----------------------------------------------------------------------------
   # first, we merge all the data into a single datafile
   fulldata <- data.frame(cbind(out, delta, treat, z, xpscore))
   #-----------------------------------------------------------------------------
+  # set up all unique uncensored points in the data (use it as ysup, if NULL)
+  yy <- sort(unique(fulldata[fulldata$delta == 1,]$out))
+  if (is.null(ysup) == TRUE){
+    ysup <- yy
+  }
+  #-----------------------------------------------------------------------------
   # Next, we set up the bootstrap function
-  boot1.kmlqte <- function(fulldata, i, probs1 = probs,
+  boot1.kmldte <- function(fulldata, i, ysup1 = ysup,
                            standardize1 = standardize, monot1 = monot){
     #----------------------------------------------------------------------------
     # Select the data for the bootstrap (like the original data)
@@ -132,7 +138,7 @@ kmlqte <- function(out, delta, treat, z, xpscore, probs = 0.5, b = 1000,
     w1km.b <- w1km.b / kappa1
     w0km.b <- w0km.b / kappa0
     #-----------------------------------------------------------------------------
-    # Compute Counterfactual quantiles, and the QTE
+    # Compute Counterfactual quantiles, and the dte
     # First, we KM estimates of the potential outcomes distribution
     kmcdf.y1 <- w.ecdf(df.b$out, w1km.b)
     kmcdf.y0 <- w.ecdf(df.b$out, w0km.b)
@@ -155,14 +161,14 @@ kmlqte <- function(out, delta, treat, z, xpscore, probs = 0.5, b = 1000,
       kmcdf.y0 <- r.ecdf(yy, kmcdf.y0)
     }
 
-    #quantiles of y1 and y0 for compliers, and lqte
-    qy1.c <- stats::quantile(kmcdf.y1, type = 1, probs = probs1)
-    qy0.c <- stats::quantile(kmcdf.y0, type = 1, probs = probs1)
+    #Distribution of y1 and y0, and dte
+    cdfy1.c <- kmcdf.y1(ysup1)
+    cdfy0.c <- kmcdf.y0(ysup1)
 
-    lqte <- qy1.c - qy0.c
+    ldte <- cdfy1.c - cdfy0.c
 
     #-----------------------------------------------------------------------------
-    return(cbind(qy1.c, qy0.c, lqte))
+    return(cbind(cdfy1.c, cdfy0.c, ldte))
   }
   #-----------------------------------------------------------------------------
   # Number of bootstrap draws
@@ -170,78 +176,78 @@ kmlqte <- function(out, delta, treat, z, xpscore, probs = 0.5, b = 1000,
   #----------------------------------------------------------------------------
   #COmput the bootstrap
   if (cores == 1){
-    boot.kmlqte <- boot::boot(fulldata, boot1.kmlqte, R = nboot,
+    boot.kmldte <- boot::boot(fulldata, boot1.kmldte, R = nboot,
                              stype = "i", sim = "ordinary")
   }
   if (cores > 1){
     cl <- parallel::makeCluster(cores)
     #clusterExport(cl, "kmweight")
     parallel::clusterSetRNGStream(cl)
-    boot.kmlqte <- boot::boot(fulldata, boot1.kmlqte, R = nboot, parallel = "snow",
+    boot.kmldte <- boot::boot(fulldata, boot1.kmldte, R = nboot, parallel = "snow",
                              ncpus = cores, stype = "i", sim = "ordinary")
     parallel::stopCluster(cl)
   }
   #----------------------------------------------------------------------------
-  # Compute Counterfactual quantiles for compliers and the LQTE
-  qy1.c <- matrix(boot.kmlqte$t0[,1],1,length(probs))
-  rownames(qy1.c) <- "Local Quantile Y(1)"
-  colnames(qy1.c) <- names(quantile(1, probs = probs))
+  # Compute Counterfactual distributions and the ldte
+  cdfy1.c <- matrix(boot.kmldte$t0[,1],1,length(ysup))
+  rownames(cdfy1.c) <- "CDF Y(1) for Compliers"
+  colnames(cdfy1.c) <- ysup
 
-  qy0.c <- matrix(boot.kmlqte$t0[,2],1,length(probs))
-  rownames(qy0.c) <- "Local Quantile Y(0)"
-  colnames(qy0.c) <- names(quantile(1, probs = probs))
+  cdfy0.c <- matrix(boot.kmldte$t0[,2],1,length(ysup))
+  rownames(cdfy0.c) <- "CDF Y(0) for Compliers"
+  colnames(cdfy0.c) <- ysup
 
-  lqte <- matrix(boot.kmlqte$t0[,3],1,length(probs))
-  rownames(lqte) <- "LQTE"
-  colnames(lqte) <- names(quantile(1, probs = probs))
+  ldte <- matrix(boot.kmldte$t0[,3],1,length(ysup))
+  rownames(ldte) <- "LDTE"
+  colnames(ldte) <- ysup
   #----------------------------------------------------------------------------
-  #Compute the confidence interval for lqte
-  n.probs <- length(probs)
+  #Compute the confidence interval for ldte
+  n.ysup <- length(ysup)
   n.ci <- length(ci)
 
-  if (n.ci == 1 & n.probs == 1){
-    lqte.lb <- boot::boot.ci(boot.kmlqte, type="perc", index = 3, conf = ci)$percent[4]
-    lqte.ub <- boot::boot.ci(boot.kmlqte, type="perc", index = 3, conf = ci)$percent[5]
+  if (n.ci == 1 & n.ysup == 1){
+    ldte.lb <- boot::boot.ci(boot.kmldte, type="perc", index = 3, conf = ci)$percent[4]
+    ldte.ub <- boot::boot.ci(boot.kmldte, type="perc", index = 3, conf = ci)$percent[5]
   }
 
-  if (n.ci >1 & n.probs == 1){
-    lqte.lb <- boot::boot.ci(boot.kmlqte, type="perc", index = 3, conf = ci)$percent[,4]
-    lqte.ub <- boot::boot.ci(boot.kmlqte, type="perc", index = 3, conf = ci)$percent[,5]
+  if (n.ci >1 & n.ysup == 1){
+    ldte.lb <- boot::boot.ci(boot.kmldte, type="perc", index = 3, conf = ci)$percent[,4]
+    ldte.ub <- boot::boot.ci(boot.kmldte, type="perc", index = 3, conf = ci)$percent[,5]
   }
 
-  if ((n.ci == 1) * (n.probs > 1) == 1){
-    lqte.lb <- matrix(NA, n.ci, n.probs)
-    lqte.ub <- matrix(NA, n.ci, n.probs)
-    for (i in 1:n.probs){
-      lqte.lb[,i] <- boot::boot.ci(boot.kmlqte, type="perc",
-                                  index = (i+ 2* n.probs), conf = ci)$percent[4]
-      lqte.ub[,i] <- boot::boot.ci(boot.kmlqte, type="perc",
-                                  index = (i+ 2* n.probs), conf = ci)$percent[5]
+  if ((n.ci == 1) * (n.ysup > 1) == 1){
+    ldte.lb <- matrix(NA, n.ci, n.ysup)
+    ldte.ub <- matrix(NA, n.ci, n.ysup)
+    for (i in 1:n.ysup){
+      ldte.lb[,i] <- boot::boot.ci(boot.kmldte, type="perc",
+                                  index = (i+ 2* n.ysup), conf = ci)$percent[4]
+      ldte.ub[,i] <- boot::boot.ci(boot.kmldte, type="perc",
+                                  index = (i+ 2* n.ysup), conf = ci)$percent[5]
     }
   }
 
-  if ((n.ci > 1) * (n.probs > 1) == 1){
-    lqte.lb <- matrix(NA, n.ci, n.probs)
-    lqte.ub <- matrix(NA, n.ci, n.probs)
-    for (i in 1:n.probs){
-      lqte.lb[,i] <- boot::boot.ci(boot.kmlqte, type="perc",
-                                  index = (i+ 2* n.probs), conf = ci)$percent[,4]
-      lqte.ub[,i] <- boot::boot.ci(boot.kmlqte, type="perc",
-                                  index = (i+ 2* n.probs), conf = ci)$percent[,5]
+  if ((n.ci > 1) * (n.ysup > 1) == 1){
+    ldte.lb <- matrix(NA, n.ci, n.ysup)
+    ldte.ub <- matrix(NA, n.ci, n.ysup)
+    for (i in 1:n.ysup){
+      ldte.lb[,i] <- boot::boot.ci(boot.kmldte, type="perc",
+                                  index = (i+ 2* n.ysup), conf = ci)$percent[,4]
+      ldte.ub[,i] <- boot::boot.ci(boot.kmldte, type="perc",
+                                  index = (i+ 2* n.ysup), conf = ci)$percent[,5]
     }
   }
   #----------------------------------------------------------------------------
-  colnames(lqte.lb) <- paste(names(quantile(1, probs = probs)), "quantile")
-  colnames(lqte.ub) <- paste(names(quantile(1, probs = probs)), "quantile")
-  rownames(lqte.ub) <- paste(names(quantile(1, probs = ci)), 'CI: UB')
-  rownames(lqte.lb) <- paste(names(quantile(1, probs = ci)), 'CI: LB')
+  colnames(ldte.lb) <- ysup
+  colnames(ldte.ub) <- ysup
+  rownames(ldte.ub) <- paste(names(quantile(1, probs = ci)), 'CI: UB')
+  rownames(ldte.lb) <- paste(names(quantile(1, probs = ci)), 'CI: LB')
   #----------------------------------------------------------------------------
   # Return these
-  list(lqte = lqte,
-       qy1.c = qy1.c,
-       qy0.c = qy0.c,
-       #boot = boot.kmlqte,
-       lqte.lb = lqte.lb,
-       lqte.ub = lqte.ub
+  list(ldte = ldte,
+       cdfy1.c = cdfy1.c,
+       cdfy.c = cdfy0.c,
+       #boot = boot.kmldte,
+       ldte.lb = ldte.lb,
+       ldte.ub = ldte.ub
   )
 }
