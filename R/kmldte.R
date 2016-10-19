@@ -132,8 +132,7 @@ kmldte <- function(out, delta, treat, z, xpscore, ysup = NULL, b = 1000,
 
     # Warning message if negative weigths
     if (monot1 == FALSE & min(min(w1km.b),min(w0km.b)) < 0){
-      warning(" Some of the weights used in computing the Distributions are negative.
-              Consider setting monot == TRUE")
+      warning(" Some of the weights used in computing the Distributions are negative. Consider setting monot == TRUE")
     }
 
     # Next, we rearrange these distributions
