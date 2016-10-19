@@ -7,10 +7,6 @@ w.ecdf=function(q,w){
     stop ("'q' must be sorted beforehand")
   if (n != length(w))
     stop ("'q' and 'w' must have the same length")
-  if (min(w) < 0)
-    stop ("'w' must be non-negative")
-  if (max(w) > 1)
-    stop ("'w' must be not greater than 1")
 
   vals <- unique(q)
   if (anyDuplicated(q)) {
