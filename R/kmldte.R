@@ -232,7 +232,7 @@ kmldte <- function(out, delta, treat, z, xpscore, ysup = NULL, b = 1000,
   # Return these
   list(ldte = ldte,
        cdfy1.c = cdfy1.c,
-       cdfy.c = cdfy0.c,
+       cdfy0.c = cdfy0.c,
        #boot = boot.kmldte,
        ldte.lb = ldte.lb,
        ldte.ub = ldte.ub
