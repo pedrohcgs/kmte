@@ -5,7 +5,7 @@
 \title{Kaplan-Meier Local Average Treatment Effect}
 \usage{
 kmlate(out, delta, treat, z, xpscore, b = 1000, ci = c(0.9, 0.95, 0.99),
-  trunc = NULL, standardize = TRUE, cores = 1)
+  trunc = NULL, cores = 1)
 }
 \arguments{
 \item{out}{vector containing the outcome of interest}
@@ -29,9 +29,6 @@ of the required interval(s). Default is a vector with
 \item{trunc}{scalar that defined the truncation parameter. Default is NULL, which does not perform any kind of
 truncation in the computation of the ATE. When trunc is different than NULL, all outcomes which values greater
 than trunc are truncated.}
-
-\item{standardize}{Default is TRUE, which normalizes instrument propensity score weights to sum to 1 within each
-treatment/instrument group. Set to FALSE to return Horvitz-Thompson weights.}
 
 \item{cores}{number of processesors to be used during the bootstrap (default is 1).
 If cores>1, the bootstrap is conducted using snow}

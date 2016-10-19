@@ -21,8 +21,6 @@
 #'@param trunc scalar that defined the truncation parameter. Default is NULL, which does not perform any kind of
 #'            truncation in the computation of the ATE. When trunc is different than NULL, all outcomes which values greater
 #'            than trunc are truncated.
-#'@param standardize Default is TRUE, which normalizes instrument propensity score weights to sum to 1 within each
-#'                    treatment/instrument group. Set to FALSE to return Horvitz-Thompson weights.
 #'@param cores number of processesors to be used during the bootstrap (default is 1).
 #'        If cores>1, the bootstrap is conducted using snow
 #'
@@ -35,13 +33,13 @@
 #'@importFrom boot boot.ci boot
 #-----------------------------------------------------------------------------
 kmlate <- function(out, delta, treat, z, xpscore, b = 1000, ci = c(0.90,0.95,0.99),
-                  trunc = NULL, standardize = TRUE, cores = 1) {
+                  trunc = NULL, cores = 1) {
   #-----------------------------------------------------------------------------
   # first, we merge all the data into a single datafile
   fulldata <- data.frame(cbind(out, delta, treat, z, xpscore))
   #-----------------------------------------------------------------------------
   # Next, we set up the bootstrap function
-  boot1.kmlate <- function(fulldata, i, trunc1 = trunc, standardize1 = standardize){
+  boot1.kmlate <- function(fulldata, i, trunc1 = trunc){
     #----------------------------------------------------------------------------
     # Select the data for the bootstrap (like the original data)
     df.b=fulldata[i,]
@@ -103,18 +101,6 @@ kmlate <- function(out, delta, treat, z, xpscore, b = 1000, ci = c(0.90,0.95,0.9
     kappa10 <- mean(df.b$treat * (1-df.b$z) / (1 - df.b$pscore))
     kappa01 <- mean((1 - df.b$treat) * df.b$z / df.b$pscore)
     kappa00 <- mean((1 - df.b$treat) * (1-df.b$z) / (1 - df.b$pscore))
-
-
-    if (standardize1 == TRUE) {
-      w11km.b <- w11km.b / mean(((df.b$z) / df.b$pscore))
-      w10km.b <- w10km.b / mean((((1 - df.b$z)) / (1 - df.b$pscore)))
-      w01km.b <- w01km.b / mean((df.b$z / df.b$pscore))
-      w00km.b <- w00km.b / mean(((1 - df.b$z) * df.b$w / (1 - df.b$pscore)))
-      kappa11 <- kappa11 / mean(df.b$z / df.b$pscore)
-      kappa10 <- kappa10 / mean((1-df.b$z) / (1 - df.b$pscore))
-      kappa01 <- kappa01 / mean(df.b$z / df.b$pscore)
-      kappa00 <- kappa00 / mean((1-df.b$z) / (1 - df.b$pscore))
-    }
 
     w1km.b <- w11km.b - w10km.b
     w0km.b <- w01km.b - w00km.b

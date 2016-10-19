@@ -21,8 +21,6 @@
 #'@param ci A scalar or vector with values in (0,1) containing the confidence level(s)
 #'          of the required interval(s). Default is a vector with
 #'          0,90, 0.95 and 0.99
-#'@param standardize Default is TRUE, which normalizes instrument propensity score weights to sum to 1 within each
-#'                    treatment/instrument group. Set to FALSE to return Horvitz-Thompson weights.
 #'@param cores number of processesors to be used during the bootstrap (default is 1).
 #'        If cores>1, the bootstrap is conducted using snow.
 #'@param monot Default is TRUE, which impose that the estimated counterfactual distributions are in
@@ -41,15 +39,13 @@
 #'@importFrom Rearrangement rearrangement
 #-----------------------------------------------------------------------------
 kmlqte <- function(out, delta, treat, z, xpscore, probs = 0.5, b = 1000,
-                   ci = c(0.90,0.95,0.99),
-                   standardize = TRUE, cores = 1, monot = TRUE) {
+                   ci = c(0.90,0.95,0.99), cores = 1, monot = TRUE) {
   #-----------------------------------------------------------------------------
   # first, we merge all the data into a single datafile
   fulldata <- data.frame(cbind(out, delta, treat, z, xpscore))
   #-----------------------------------------------------------------------------
   # Next, we set up the bootstrap function
-  boot1.kmlqte <- function(fulldata, i, probs1 = probs,
-                           standardize1 = standardize, monot1 = monot){
+  boot1.kmlqte <- function(fulldata, i, probs1 = probs, monot1 = monot){
     #----------------------------------------------------------------------------
     # Select the data for the bootstrap (like the original data)
     df.b=fulldata[i,]
@@ -111,17 +107,6 @@ kmlqte <- function(out, delta, treat, z, xpscore, probs = 0.5, b = 1000,
     kappa10 <- mean(df.b$treat * (1-df.b$z) / (1 - df.b$pscore))
     kappa01 <- mean((1 - df.b$treat) * df.b$z / df.b$pscore)
     kappa00 <- mean((1 - df.b$treat) * (1-df.b$z) / (1 - df.b$pscore))
-
-    if (standardize1 == TRUE) {
-      w11km.b <- w11km.b / mean(((df.b$z) / df.b$pscore))
-      w10km.b <- w10km.b / mean((((1 - df.b$z)) / (1 - df.b$pscore)))
-      w01km.b <- w01km.b / mean((df.b$z / df.b$pscore))
-      w00km.b <- w00km.b / mean(((1 - df.b$z) * df.b$w / (1 - df.b$pscore)))
-      kappa11 <- kappa11 / mean(df.b$z / df.b$pscore)
-      kappa10 <- kappa10 / mean((1-df.b$z) / (1 - df.b$pscore))
-      kappa01 <- kappa01 / mean(df.b$z / df.b$pscore)
-      kappa00 <- kappa00 / mean((1-df.b$z) / (1 - df.b$pscore))
-    }
 
     w1km.b <- w11km.b - w10km.b
     w0km.b <- w01km.b - w00km.b

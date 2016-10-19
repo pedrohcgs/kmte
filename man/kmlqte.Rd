@@ -5,7 +5,7 @@
 \title{Kaplan-Meier Local Quantile Treatment Effect}
 \usage{
 kmlqte(out, delta, treat, z, xpscore, probs = 0.5, b = 1000, ci = c(0.9,
-  0.95, 0.99), standardize = TRUE, cores = 1, monot = TRUE)
+  0.95, 0.99), cores = 1, monot = TRUE)
 }
 \arguments{
 \item{out}{vector containing the outcome of interest}
@@ -29,9 +29,6 @@ the median.}
 \item{ci}{A scalar or vector with values in (0,1) containing the confidence level(s)
 of the required interval(s). Default is a vector with
 0,90, 0.95 and 0.99}
-
-\item{standardize}{Default is TRUE, which normalizes instrument propensity score weights to sum to 1 within each
-treatment/instrument group. Set to FALSE to return Horvitz-Thompson weights.}
 
 \item{cores}{number of processesors to be used during the bootstrap (default is 1).
 If cores>1, the bootstrap is conducted using snow.}
