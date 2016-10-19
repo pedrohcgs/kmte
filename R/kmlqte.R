@@ -123,6 +123,12 @@ kmlqte <- function(out, delta, treat, z, xpscore, probs = 0.5, b = 1000,
     kmcdf.y1 <- w.ecdf(df.b$out, w1km.b)
     kmcdf.y0 <- w.ecdf(df.b$out, w0km.b)
 
+    # Warning message if negative weigths
+    if (monot1 == FALSE & min(min(w1km.b),min(w0km.b)) < 0){
+      warning(" Some of the weights used in computing the quantiles are negative.
+              Consider setting monot == TRUE")
+    }
+
     # Next, we rearrange these distributions
     if (monot1 == TRUE) {
       # get all unique uncensored data points out
