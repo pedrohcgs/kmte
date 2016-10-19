@@ -2,7 +2,7 @@
 % Please edit documentation in R/kmdte.R
 \name{kmdte}
 \alias{kmdte}
-\title{kmdte: Two-Step Kaplan-Meier Distributional Treatment Effect}
+\title{kmdte: Kaplan-Meier Distributional Treatment Effect}
 \usage{
 kmdte(out, delta, treat, ysup = NULL, xpscore, b = 1000, ci = c(0.9, 0.95,
   0.99), standardize = TRUE, cores = 1)

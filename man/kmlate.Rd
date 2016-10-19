@@ -2,7 +2,7 @@
 % Please edit documentation in R/kmlate.R
 \name{kmlate}
 \alias{kmlate}
-\title{kmlate: Two-Step Kaplan-Meier Average Treatment Effect}
+\title{kmlate: Kaplan-Meier Local Average Treatment Effect}
 \usage{
 kmlate(out, delta, treat, z, xpscore, b = 1000, ci = c(0.9, 0.95, 0.99),
   trunc = NULL, standardize = TRUE, cores = 1)

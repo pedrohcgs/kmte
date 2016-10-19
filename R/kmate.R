@@ -1,4 +1,4 @@
-#' kmate: Two-Step Kaplan-Meier Average Treatment Effect
+#' kmate: Kaplan-Meier Average Treatment Effect
 #'
 #' \emph{kmate} computes the Average Treatment Effect for possibly right-censored outcomes.
 #' The estimator relies on the unconfoundedness assumption, and on estimating the propensity score.
