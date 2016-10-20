@@ -35,6 +35,6 @@ for the null hypothesis of zero conditional average treatment effects.
 The test is suitable for both censored and uncensored outcomes, and relies on
 the unconfoundedness assumption. For details of the testing procedure, see
 Sant'Anna (2016b),'Nonparametric Tests for Treatment Effect Heterogeneity with
-Censored data'.
+Duration Outcomes'.
 }
 

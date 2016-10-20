@@ -37,6 +37,6 @@ for the null hypothesis of zero conditional local distribution treatment effects
 The test is suitable for both censored and uncensored outcomes, and relies on
 the availability of a binary instrumental variable that satisfies additional assumptions.
 For details of the testing procedure, see Sant'Anna (2016b),'Nonparametric Tests for
-Treatment Effect Heterogeneity with Censored data'.
+Treatment Effect Heterogeneity with Duration Outcomes'.
 }
 

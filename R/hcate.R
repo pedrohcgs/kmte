@@ -5,7 +5,7 @@
 #' The test is suitable for both censored and uncensored outcomes, and relies on
 #' the unconfoundedness assumption. For details of the testing procedure, see
 #' Sant'Anna (2016b),'Nonparametric Tests for Treatment Effect Heterogeneity with
-#' Censored data'.
+#' Duration Outcomes'.
 #'
 #'@param out vector containing the outcome of interest
 #'@param delta vector containing the censoring indicator (1 if observed, 0 if censored)
