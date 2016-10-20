@@ -5,12 +5,12 @@
 \alias{kmte-package}
 \title{An R Package for Treatment Effects with Censored Outcomes.}
 \description{
-The kmte R package includes a variety of policy evaluations tools when the outcome of interest, typically a duration, is subjected to right
+The \emph{kmte} R package includes a variety of policy evaluations tools when the outcome of interest, typically a duration, is subjected to right
 censoring. The content includes estimators and tests related to average, quantile and distributional treatment effects under different
 identifying assumptions including unconfoundedness, local treatment effects, and nonlinear difrences-in-differences.
 }
 \details{
-In short, kmte implements all estimators proposed in Sant'Anna (2016a) "Program Evaluation with Right-Censored Data", and all tests proposed
+In short, \emph{kmte} implements all estimators proposed in Sant'Anna (2016a) "Program Evaluation with Right-Censored Data", and all tests proposed
 in Sant'Anna (2016b), "Nonparametric Tests for Treatment Effect Heterogeneity with Duration Outcomes". Both articles are available at
 Pedro H.C. Sant'Anna webpage, \url{http://sites.google.com/site/pedrohcsantanna/} .
 
@@ -24,13 +24,13 @@ one can use the following functions:
 
 Alternatively, when the treatment is endogenous and we have a binary instrument, i.e. under the local treatment effect setup,
 one can use the following functions:
-#'\itemize{
+\itemize{
   \item kmlate - compute the Local Average Treatment Effect for possibly randomly censored data.
-  \item kmlqte - compute the LocalQuantile Treatment Effect for possibly randomly censored data.
+  \item kmlqte - compute the Local Quantile Treatment Effect for possibly randomly censored data.
   \item kmldte - compute the Local Distributional Treatment Effect for possibly randomly censored data.
 }
 
-In addition, the kmte package also implements the following nonparametric tests for treatment effect heterogeneity:
+In addition, the \emph{kmte} package also implements the following nonparametric tests for treatment effect heterogeneity:
 
 \enumerate{
 \item Under Unconfoundedness:
@@ -40,7 +40,7 @@ In addition, the kmte package also implements the following nonparametric tests 
   \item hcate - compute different tests for the null hypothesis of Homogeneous Conditional Average Treatment Effetcs.
 }
 \item Under the Local Treatment Setup:
-#'\itemize{
+\itemize{
   \item zclate - compute different tests for the null hypothesis of Zero Conditional Local Average Treatment Effetcs.
   \item zcldte - compute different tests for the null hypothesis of Zero Conditional Local Distributional Treatment Effetcs.
   \item hclate - compute different tests for the null hypothesis of Homogeneous Conditional Local Average Treatment Effetcs.
