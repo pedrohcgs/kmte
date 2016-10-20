@@ -3,7 +3,7 @@
 ## Description 
 This R package includes a variety of policy evaluations when the outcome of interest, typically a duration, is subjected to right censoring. The content includes estimators and tests related to average, quantile and distributional treatment effects under different identifying assumptions including unconfoundedness, local treatment effects, and nonlinear difrences-in-differences. 
 
-In short, the R package implements all estimators proposed in Sant'Anna (2016a) "Program Evaluation with Right-Censored Data", and all tests proposed in Sant'Anna (2016b), "Nonparametric Tests for Treatment Effect Heterogeneity with Duration Outcomes", both available at Pedro H.C. Sant'Anna webpage, https://sites.google.com/site/pedrohcsantanna/ .
+In short, the R package implements all estimators proposed in Sant'Anna (2016a) "Program Evaluation with Right-Censored Data", and all tests proposed in Sant'Anna (2016b), "Nonparametric Tests for Treatment Effect Heterogeneity with Duration Outcomes". Both articles are available at Pedro H.C. Sant'Anna webpage, https://sites.google.com/site/pedrohcsantanna/ .
 
 ## Functions
 ### Exogenous Treatment Allocation (Unconfoundedness setup)
