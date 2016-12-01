@@ -120,8 +120,8 @@ kmqte <- function(out, delta, treat, probs = 0.5,
     #quantiles of y1 and y0, and qte
     #qy1 <- stats::quantile(kmcdf.y1.r, type = 1, probs = probs1)
     #qy0 <- stats::quantile(kmcdf.y0.r, type = 1, probs = probs1)
-    qy1 <- stats::quantile(kmcdf.y1, type = 1, probs = probs1)
-    qy0 <- stats::quantile(kmcdf.y0, type = 1, probs = probs1)
+    qy1 <- stats::quantile(kmcdf.y1(df.b$out), type = 1, probs = probs1)
+    qy0 <- stats::quantile(kmcdf.y0(df.b$out), type = 1, probs = probs1)
 
     qte <- qy1 - qy0
     #-----------------------------------------------------------------------------
