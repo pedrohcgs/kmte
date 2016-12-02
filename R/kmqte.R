@@ -29,7 +29,7 @@
 #'        and the bootstrapped \emph{ci} confidence
 #'        confidence interval, qte.lb (lower bound), and qte.ub (upper bound).
 #'@export
-#'@importFrom stats glm quantile approxfun
+#'@importFrom stats glm approxfun
 #'@importFrom parallel makeCluster stopCluster clusterExport
 #'@importFrom boot boot.ci boot
 #'@importFrom Rearrangement rearrangement
@@ -104,24 +104,8 @@ kmqte <- function(out, delta, treat, probs = 0.5,
     kmcdf.y1 <- w.ecdf(df.b$out, w1km.b)
     kmcdf.y0 <- w.ecdf(df.b$out, w0km.b)
 
-    # Next, we rearrange these distributions
-    #kmcdf.y1.r <- Rearrangement::rearrangement(data.frame(df.b$out),
-    #                                           kmcdf.y1(df.b$out))
-    #kmcdf.y1.r[kmcdf.y1.r > 1] <- 1
-    #kmcdf.y1.r[kmcdf.y1.r < 0] <- 0
-    #kmcdf.y1.r <- r.ecdf(df.b$out, kmcdf.y1.r)
-
-    #kmcdf.y0.r <- Rearrangement::rearrangement(data.frame(df.b$out),
-    #                                           kmcdf.y0(df.b$out))
-    #kmcdf.y0.r[kmcdf.y0.r > 1] <- 1
-    #kmcdf.y0.r[kmcdf.y0.r<0] <- 0
-    #kmcdf.y0.r <- r.ecdf(df.b$out, kmcdf.y0.r)
-
-    #quantiles of y1 and y0, and qte
-    #qy1 <- stats::quantile(kmcdf.y1.r, type = 1, probs = probs1)
-    #qy0 <- stats::quantile(kmcdf.y0.r, type = 1, probs = probs1)
-    qy1 <- stats::quantile(kmcdf.y1(df.b$out), type = 1, probs = probs1)
-    qy0 <- stats::quantile(kmcdf.y0(df.b$out), type = 1, probs = probs1)
+    qy1 <- quantile.2skm(kmcdf.y1, probs = probs1)
+    qy0 <- quantile.2skm(kmcdf.y0, probs = probs1)
 
     qte <- qy1 - qy0
     #-----------------------------------------------------------------------------
@@ -130,7 +114,6 @@ kmqte <- function(out, delta, treat, probs = 0.5,
   #-----------------------------------------------------------------------------
   # Number of bootstrap draws
   nboot <- b
-  #----------------------------------------------------------------------------
   #COmput the bootstrap
   if (cores == 1){
     boot.kmqte <- boot::boot(fulldata, boot1.kmqte, R = nboot,

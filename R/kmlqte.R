@@ -148,8 +148,8 @@ kmlqte <- function(out, delta, treat, z, xpscore, probs = 0.5, b = 1000,
     }
 
     #quantiles of y1 and y0 for compliers, and lqte
-    qy1.c <- stats::quantile(kmcdf.y1, type = 1, probs = probs1)
-    qy0.c <- stats::quantile(kmcdf.y0, type = 1, probs = probs1)
+    qy1.c <- quantile.2skm(kmcdf.y1, probs = probs1)
+    qy0.c <- quantile.2skm(kmcdf.y0, probs = probs1)
 
     lqte <- qy1.c - qy0.c
 
