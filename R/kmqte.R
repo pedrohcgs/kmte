@@ -149,8 +149,8 @@ kmqte <- function(out, delta, treat, probs = 0.5,
     qte.lb <- matrix(NA, n.ci, n.probs)
     qte.ub <- matrix(NA, n.ci, n.probs)
     boot.kmqte.na=na.omit(boot.kmqte$t0)
-    n.probs.na=length(boot.kmqte.na)/3
-    if(n.probs.na>0){
+    n.probs.na <- length(boot.kmqte.na)/3
+    if(n.probs.na > 0){
       qte.lb[,1] <- boot::boot.ci(boot.kmqte, type="perc", index = 3, conf = ci)$percent[4]
       qte.ub [,1] <- boot::boot.ci(boot.kmqte, type="perc", index = 3, conf = ci)$percent[5]
     }
@@ -160,8 +160,8 @@ kmqte <- function(out, delta, treat, probs = 0.5,
     qte.lb <- matrix(NA, n.ci, n.probs)
     qte.ub <- matrix(NA, n.ci, n.probs)
     boot.kmqte.na=na.omit(boot.kmqte$t0)
-    n.probs.na=length(boot.kmqte.na)/3
-    if(n.probs.na>0){
+    n.probs.na <- length(boot.kmqte.na)/3
+    if(n.probs.na > 0){
       qte.lb[,1] <- boot::boot.ci(boot.kmqte, type="perc", index = 3, conf = ci)$percent[,4]
       qte.ub[,1] <- boot::boot.ci(boot.kmqte, type="perc", index = 3, conf = ci)$percent[,5]
     }
@@ -171,8 +171,8 @@ kmqte <- function(out, delta, treat, probs = 0.5,
     qte.lb <- matrix(NA, n.ci, n.probs)
     qte.ub <- matrix(NA, n.ci, n.probs)
     boot.kmqte.na=na.omit(boot.kmqte$t0)
-    n.probs.na=length(boot.kmqte.na)/3
-    if(n.probs.na>0){
+    n.probs.na <- length(boot.kmqte.na)/3
+    if(n.probs.na > 0){
       for (i in 1:n.probs.na){
         qte.lb[,i] <- boot::boot.ci(boot.kmqte, type="perc",
                                     index = (i+ 2* n.probs), conf = ci)$percent[4]
@@ -185,10 +185,9 @@ kmqte <- function(out, delta, treat, probs = 0.5,
   if ((n.ci > 1) * (n.probs > 1) == 1){
     qte.lb <- matrix(NA, n.ci, n.probs)
     qte.ub <- matrix(NA, n.ci, n.probs)
-
     boot.kmqte.na=na.omit(boot.kmqte$t0)
-    n.probs.na=length(boot.kmqte.na)/3
-    if(n.probs.na>0){
+    n.probs.na <- length(boot.kmqte.na)/3
+    if(n.probs.na > 0){
       for (i in 1:n.probs.na){
         qte.lb[,i] <- boot::boot.ci(boot.kmqte, type="perc",
                                     index = (i+ 2* n.probs), conf = ci)$percent[,4]
